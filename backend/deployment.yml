@@ -1,0 +1,142 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kickerscore-db-service
+  namespace: kickerscore
+  labels:
+    app: kickerscore
+    tier: postgres
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: kickerscore
+    tier: postgres
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kickerscore-backend-service
+  namespace: kickerscore
+  labels:
+    app: kickerscore
+    tier: backend
+spec:
+  ports:
+    - port: 80
+      targetPort: 5000
+  selector:
+    app: kickerscore
+    tier: backend
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kickerscore-pv
+  namespace: kickerscore
+  labels:
+    app: kickerscore
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/var/data/kickerscore"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pv-claim
+  namespace: kickerscore
+  labels:
+    app: kickerscore
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kickerscore-db-deployment
+  namespace: kickerscore
+  labels:
+    app: kickerscore
+    tier: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kickerscore
+      tier: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: kickerscore
+        tier: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+          - name: postgres-persistent-storage
+            mountPath: /var/lib/postgres
+      volumes:
+        - name: postgres-persistent-storage
+          claimName: postgres-pv-claim
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kickerscore-deployment
+  namespace: kickerscore
+  labels:
+    app: kickerscore
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kickerscore
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: kickerscore
+        tier: backend
+    spec:
+      containers:
+      - name: kickerscore-backend
+        image: kickerscore-backend
+        ports:
+        - containerPort: 5000
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kickerstats-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: hyperion.bigdatarepublic.nl
+    http:
+      paths:
+      - path: /kickers
+        backend:
+          serviceName: kickerscore-backend-service
+          servicePort: 80
