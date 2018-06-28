@@ -34,8 +34,8 @@ Playing a single game resets the timer and prevents decay for 14 days.
 
 ### Match endpoint
 
-#### GET /kickers/api/v1/matches
-Returns most recent 100 finished matches in the database.
+#### GET /kickerscore/api/v1/matches
+Returns 100 most recent finished matches in the database.
 
 ```
 - id: ...
@@ -56,9 +56,10 @@ Returns most recent 100 finished matches in the database.
 - ...
 ```
 
-#### GET /kickers/api/v1/match/[id]
+#### GET /kickerscore/api/v1/match/[id]
 Returns match with the specified id.
 
+Returns:
 ```
 id: ...
 players:
@@ -75,8 +76,9 @@ points:
   blue: ...
   red: ...
 ```
+Any of the above attributes can be null if unknown (in case the match is not finished yet or results weren't entered).
 
-#### POST /kickers/api/v1/match
+#### POST /kickerscore/api/v1/match
 Create a new match.
 
 Arguments:
@@ -103,16 +105,17 @@ predicted_win_prob_for_blue: <probability that blue team will win this match giv
 match_balance: <measure between 0 and 1 how balanced this match is, given the optimal team composition is used>
 ```
 
-#### PUT /kickers/api/v1/match/[id]
-Sets match outcome and/or team composition.
-If `team_composition` is omitted, the optimal team composition is assumed.
+#### PATCH /kickerscore/api/v1/match/[id]
+Sets match outcome and/or players.
+If `players` is omitted, the optimal team composition is assumed.
 If `points` is omitted, match is assumed not to have finished yet.
 Once this method is called and `points` is given, a match cannot be changed anymore and all players' TrueSkill ratings are updated.
+Before calling this method, make sure the match is created using the POST call to the match API.
 
 Arguments:
 
 ```
-team_composition:
+players:
   blue:
     offense: ...
     defense: ...
@@ -146,7 +149,7 @@ trueskill:
     ...
 ```
 
-#### GET /kickers/api/v1/match_predict
+#### GET /kickerscore/api/v1/match_predict
 Predicts win chance of blue team and shows match balance.
 
 ```
@@ -166,7 +169,7 @@ predicted_win_prob_for_blue: ...
 match_balance: ...
 ```
 
-#### GET /kickers/api/v1/players
+#### GET /kickerscore/api/v1/players
 Shows all player names and their three current TrueSkill ratings.
 
 Returns:
@@ -183,7 +186,7 @@ Returns:
 - ...
 ```
 
-#### GET /kickers/api/v1/player/[username]
+#### GET /kickerscore/api/v1/player/[username]
 Shows a player's TrueSkill history.
 
 Returns:
