@@ -1,5 +1,11 @@
 ---
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: kickerscore
+
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: kickerscore-db-service
@@ -95,7 +101,8 @@ spec:
             mountPath: /var/lib/postgres
       volumes:
         - name: postgres-persistent-storage
-          claimName: postgres-pv-claim
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim
 
 ---
 apiVersion: apps/v1
@@ -120,7 +127,7 @@ spec:
     spec:
       containers:
       - name: kickerscore-backend
-        image: kickerscore-backend
+        image: 10.8.0.1:30000/sreitsma/kickerscore:latest
         ports:
         - containerPort: 5000
 
@@ -128,7 +135,8 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: kickerstats-ingress
+  name: kickerscore-ingress
+  namespace: kickerscore
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
@@ -136,7 +144,7 @@ spec:
   - host: hyperion.bigdatarepublic.nl
     http:
       paths:
-      - path: /kickers
+      - path: /kickerscore
         backend:
           serviceName: kickerscore-backend-service
           servicePort: 80
