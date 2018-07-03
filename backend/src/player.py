@@ -1,11 +1,17 @@
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
+from models import Player
 
 
-class Players(Resource):
+class PlayersResource(Resource):
     def get(self):
-        return "OK", 200
+        return Player.query.all()
 
 
-class Player(Resource):
+class PlayerResource(Resource):
     def get(self):
-        return "OK", 200
+        parser = reqparse.RequestParser()
+        parser.add_argument('username', type=str)
+
+        args = parser.parse_args()
+
+        return Player.query.filter_by(username=args['username']).first()

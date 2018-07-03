@@ -79,38 +79,8 @@ points:
 Any of the above attributes can be null if unknown (in case the match is not finished yet or results weren't entered).
 
 #### POST /kickerscore/api/v1/match
-Create a new match.
-
-Arguments:
-```
-players:
-  - ...
-  - ...
-  - ...
-  - ...
-```
-
-Returns:
-
-```
-id: ...
-optimal_team_composition:
-  blue:
-    offense: ...
-    defense: ...
-  red:
-    offense: ...
-    defense: ...
-predicted_win_prob_for_blue: <probability that blue team will win this match given the optimal team composition is used>
-match_balance: <measure between 0 and 1 how balanced this match is, given the optimal team composition is used>
-```
-
-#### PATCH /kickerscore/api/v1/match/[id]
-Sets match outcome and/or players.
-If `players` is omitted, the optimal team composition is assumed.
-If `points` is omitted, match is assumed not to have finished yet.
-Once this method is called and `points` is given, a match cannot be changed anymore and all players' TrueSkill ratings are updated.
-Before calling this method, make sure the match is created using the POST call to the match API.
+Creates match and its outcome and players.
+Once this method is called, a match cannot be changed anymore and all players' TrueSkill ratings are updated.
 
 Arguments:
 
@@ -149,7 +119,34 @@ trueskill:
     ...
 ```
 
-#### GET /kickerscore/api/v1/match_predict
+#### GET /kickerscore/api/v1/analyze_players
+Analyzes some stats using just the players competing.
+
+Arguments:
+```
+players:
+  - ...
+  - ...
+  - ...
+  - ...
+```
+
+Returns:
+
+```
+id: ...
+optimal_team_composition:
+  blue:
+    offense: ...
+    defense: ...
+  red:
+    offense: ...
+    defense: ...
+predicted_win_prob_for_blue: <probability that blue team will win this match given the optimal team composition is used>
+match_balance: <measure between 0 and 1 how balanced this match is, given the optimal team composition is used>
+```
+
+#### GET /kickerscore/api/v1/analyze_teams
 Predicts win chance of blue team and shows match balance.
 
 ```

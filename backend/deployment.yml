@@ -147,6 +147,10 @@ spec:
         app: kickerscore
         tier: backend
     spec:
+      initContainers:
+        - name: kickerscore-db-migrate
+          image: 10.8.0.1:30000/sreitsma/kickerscore:latest
+          command: ["cd /opt/app && flask db upgrade"]
       containers:
       - name: kickerscore-backend
         image: 10.8.0.1:30000/sreitsma/kickerscore:latest

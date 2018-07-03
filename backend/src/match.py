@@ -1,22 +1,29 @@
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
+from models import Match
 
 
-class Matches(Resource):
+class MatchesResource(Resource):
     def get(self):
-        return "OK", 200
+        return Match.query.limit(100).all()
 
 
-class Match(Resource):
+class MatchResource(Resource):
     def get(self):
-        return "OK", 200
+        parser = reqparse.RequestParser()
+        parser.add_argument('id', type=int)
+
+        args = parser.parse_args()
+
+        return Match.query.filter_by(id=args['id']).first()
 
     def post(self):
         return "OK", 200
 
-    def patch(self):
+
+class AnalyzePlayers(Resource):
+    def get(self):
         return "OK", 200
 
-
-class MatchPredict(Resource):
+class AnalyzeTeams(Resource):
     def get(self):
         return "OK", 200

@@ -1,14 +1,10 @@
-import psycopg2
 import os
 from flask_sqlalchemy import SQLAlchemy
 
 
-class DB():
-    def __init__(self, app):
-        user = os.environ["POSTGRES_USER"]
-        password = os.environ["POSTGRES_PASSWORD"]
+db = SQLAlchemy()
 
-        try:
-            self.conn = psycopg2.connect(f"dbname='kickerscore' user='{user}' host='kickerscore-db-service.kickerscore.svc.cluster.local' password='{password}'")
-        except Exception as e:
-            raise e
+DB_USER = os.environ["POSTGRES_USER"]
+DB_PASSWORD = os.environ["POSTGRES_PASSWORD"]
+DB_HOST = "kickerscore-db-service.kickerscore.svc.cluster.local"
+DB_DATABASE = "kickerscore"
