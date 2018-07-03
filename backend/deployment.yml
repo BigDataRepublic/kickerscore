@@ -69,6 +69,17 @@ spec:
       storage: 1Gi
 
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+  namespace: kickerscore
+type: Opaque
+data:
+  username: "[hidden for git]"
+  password: "[hidden for git]"
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -99,6 +110,17 @@ spec:
         volumeMounts:
           - name: postgres-persistent-storage
             mountPath: /var/lib/postgres
+        env:
+          - name: "POSTGRES_USER"
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: username
+          - name: "POSTGRES_PASSWORD"
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: password
       volumes:
         - name: postgres-persistent-storage
           persistentVolumeClaim:
@@ -129,7 +151,32 @@ spec:
       - name: kickerscore-backend
         image: 10.8.0.1:30000/sreitsma/kickerscore:latest
         ports:
-        - containerPort: 5000
+          - containerPort: 5000
+        resources:
+          limits:
+            nvidia.com/gpu: 0
+            memory: "1024Mi"
+            cpu: "1"
+          requests:
+            memory: "256Mi"
+            cpu: "0.1"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 15
+        env:
+          - name: "POSTGRES_USER"
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: username
+          - name: "POSTGRES_PASSWORD"
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: password
 
 ---
 apiVersion: extensions/v1beta1

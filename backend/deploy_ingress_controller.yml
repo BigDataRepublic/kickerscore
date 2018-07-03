@@ -79,6 +79,14 @@ spec:
           containerPort: 80
         - name: admin
           containerPort: 8080
+        resources:
+          limits:
+            nvidia.com/gpu: 0
+            memory: "1024Mi"
+            cpu: "1"
+          requests:
+            memory: "256Mi"
+            cpu: "0.1"
         args:
         - --api
         - --kubernetes
@@ -118,11 +126,25 @@ spec:
       name: admin
 
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: traefik-admin-auth-secret
+  namespace: traefik
+type: Opaque
+data:
+  auth: "[hidden for git]"
+
+---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: traefik-admin-ingress
   namespace: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/rule-type: PathPrefixStrip
+    ingress.kubernetes.io/auth-type: basic
+    ingress.kubernetes.io/auth-secret: traefik-admin-auth-secret
 spec:
   rules:
   - http:
