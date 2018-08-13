@@ -6,5 +6,5 @@ db = SQLAlchemy()
 
 DB_USER = os.environ["POSTGRES_USER"]
 DB_PASSWORD = os.environ["POSTGRES_PASSWORD"]
-DB_HOST = "kickerscore-db-service.kickerscore.svc.cluster.local"
+DB_HOST = "localhost"  # kickerscore-db-service.kickerscore.svc.cluster.local"
 DB_DATABASE = "kickerscore"

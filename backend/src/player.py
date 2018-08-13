@@ -4,7 +4,7 @@ from models import Player
 
 class PlayersResource(Resource):
     def get(self):
-        return Player.query.all()
+        return list(map(lambda x: x.serialize(), Player.query.all()))
 
 
 class PlayerResource(Resource):
@@ -14,4 +14,9 @@ class PlayerResource(Resource):
 
         args = parser.parse_args()
 
-        return Player.query.filter_by(username=args['username']).first()
+        player = Player.query.filter_by(username=args['username']).first()
+
+        if player is None:
+            return f"Player with username {args['username']} not found", 404
+
+        return player.serialize()
