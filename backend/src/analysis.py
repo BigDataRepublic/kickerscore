@@ -1,13 +1,7 @@
 from trueskill import Rating, quality, rate, TrueSkill
 import itertools
 import math
-
-
-MU = 1000
-SIGMA = 333
-BETA = SIGMA / 2
-TAU = SIGMA / 100
-DRAW_PROB = 0.01
+from config import *
 
 
 def win_probability(ts, team1, team2):
@@ -105,3 +99,35 @@ def analyze_players(players):
             "match_balance": match_balance,
             "predicted_win_prob_for_blue": win_probability(ts, final_blue_team, final_red_team)
         }
+
+
+def _build_team(rating1, rating2):
+    team = []
+    if rating1 is not None:
+        team.append(rating1)
+
+    if rating2 is not None:
+        team.append(rating2)
+
+    return team
+
+
+def analyze_teams(player_blue_offense, player_blue_defense, player_red_offense, player_red_defense):
+    ts = TrueSkill(mu=MU, sigma=SIGMA, beta=BETA, tau=TAU, draw_probability=DRAW_PROB)
+
+    player_blue_offense_rating = Rating(mu=player_blue_offense.rating_mu,
+                                        sigma=player_blue_offense.rating_sigma) if player_blue_offense is not None else None
+    player_blue_defense_rating = Rating(mu=player_blue_defense.rating_mu,
+                                        sigma=player_blue_defense.rating_sigma) if player_blue_defense is not None else None
+    player_red_offense_rating = Rating(mu=player_red_offense.rating_mu,
+                                       sigma=player_red_offense.rating_sigma) if player_red_offense is not None else None
+    player_red_defense_rating = Rating(mu=player_red_defense.rating_mu,
+                                       sigma=player_red_defense.rating_sigma) if player_red_defense is not None else None
+
+    blue_team = _build_team(player_blue_offense_rating, player_blue_defense_rating)
+    red_team = _build_team(player_red_offense_rating, player_red_defense_rating)
+
+    match_balance = ts.quality([blue_team, red_team])
+    win_prob = win_probability(ts, blue_team, red_team)
+
+    return {"match_balance": match_balance, "predicted_win_prob_for_blue": win_prob}

@@ -1,5 +1,6 @@
 from db import db
 from datetime import datetime
+from sqlalchemy import func, desc
 
 
 class Match(db.Model):
@@ -85,6 +86,15 @@ class Player(db.Model):
     rating_sigma_defense = db.Column(db.Float, nullable=False)
 
     def serialize(self):
+        sub = db.session.query(Player.username, func.row_number().over(order_by=desc(Player.rating_mu)).label('pos')).subquery()
+        pos = db.session.query(sub.c.pos).filter(sub.c.username == self.username).scalar() - 1
+
+        sub = db.session.query(Player.username, func.row_number().over(order_by=desc(Player.rating_mu_offense)).label('pos')).subquery()
+        pos_offense = db.session.query(sub.c.pos).filter(sub.c.username == self.username).scalar() - 1
+
+        sub = db.session.query(Player.username, func.row_number().over(order_by=desc(Player.rating_mu_defense)).label('pos')).subquery()
+        pos_defense = db.session.query(sub.c.pos).filter(sub.c.username == self.username).scalar() - 1
+
         return {
             "username": self.username,
             "registration_date": str(self.registration_date),
@@ -97,5 +107,8 @@ class Player(db.Model):
                 "overall": self.rating_sigma,
                 "offense": self.rating_sigma_offense,
                 "defense": self.rating_sigma_defense
-            }
+            },
+            "rank_overall": pos,
+            "rank_offense": pos_offense,
+            "rank_defense": pos_defense
         }

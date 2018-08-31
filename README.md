@@ -27,8 +27,8 @@ kubectl apply -f deployment.yml
 For each player, three TrueSkill ratings are recorded: overall, offense and defense.
 The overall rating will be updated after every match, while the offense and defense are only updated when the player has played that specific role.
 When a new player name is entered, it is automatically added to the database, starting with a rating of 1000.
-When a player doesn't play a single game for 14 days, his TrueSkill rating will decay by 1 point per day.
-Playing a single game resets the timer and prevents decay for 14 days.
+When a player doesn't play a single game for 28 days, his TrueSkill rating will decay by 5 points per day.
+Playing a single game resets the timer and prevents decay for 28 days.
 
 ## API endpoints
 
@@ -38,85 +38,147 @@ Playing a single game resets the timer and prevents decay for 14 days.
 Returns 100 most recent finished matches in the database.
 
 ```
-- id: ...
-  players:
-    blue:
-      offense: ...
-      defense: ...
-    red:
-      offense: ...
-      defense: ...
-  winner: [blue|red|unknown]
-  predicted_win_prob_for_blue: ...
-  match_balance: ...
-  points:
-    blue: ...
-    red: ...
-- ...
-- ...
+[
+  {
+    "id": 0,
+    "players": {
+      "blue": {
+        "offense": {
+          "name": "",
+          "skill_gain_overall": 10,
+          "skill_gain_offense": 10
+        },
+        "defense": {
+          "name": "",
+          "skill_gain_overall": 10,
+          "skill_gain_defense": 10
+        }
+      },
+      "red": {
+        "offense": {
+          "name": "",
+          "skill_gain_overall": 10,
+          "skill_gain_offense": 10
+        },
+        "defense": {
+          "name": "",
+          "skill_gain_overall": 10,
+          "skill_gain_defense": 10
+        }
+      }
+    },
+    "winner": "",
+    "predicted_win_prob_for_blue": 0.5,
+    "match_balance": 0.5,
+    "points": {
+      "blue": "",
+      "red": ""
+    }
+  },
+  ...
+]
 ```
 
-#### GET /kickerscore/api/v1/match/[id]
+#### GET /kickerscore/api/v1/match?id=[id]
 Returns match with the specified id.
 
 Returns:
 ```
-id: ...
-players:
-  blue:
-    offense: ...
-    defense: ...
-  red:
-    offense: ...
-    defense: ...
-winner: [blue|red|unknown]
-predicted_win_prob_for_blue: <probability that blue team will win this match>
-match_balance: <measure between 0 and 1 how balanced this match is>
-points:
-  blue: ...
-  red: ...
+{
+  "id": 0,
+  "players": {
+    "blue": {
+      "offense": {
+        "name": "",
+        "skill_gain_overall": 10,
+        "skill_gain_offense": 10
+      },
+      "defense": {
+        "name": "",
+        "skill_gain_overall": 10,
+        "skill_gain_defense": 10
+      }
+    },
+    "red": {
+      "offense": {
+        "name": "",
+        "skill_gain_overall": 10,
+        "skill_gain_offense": 10
+      },
+      "defense": {
+        "name": "",
+        "skill_gain_overall": 10,
+        "skill_gain_defense": 10
+      }
+    }
+  },
+  "winner": "",
+  "predicted_win_prob_for_blue": 0.5,
+  "match_balance": 0.5,
+  "points": {
+    "blue": "",
+    "red": ""
+  }
+}
 ```
-Any of the above attributes can be null if unknown (in case the match is not finished yet or results weren't entered).
+Any of the above attributes can be null if unknown.
 
 #### POST /kickerscore/api/v1/match
 Creates match and its outcome and players.
-Once this method is called, a match cannot be changed anymore and all players' TrueSkill ratings are updated.
+Once this method is called, a match cannot be changed anymore and all players' TrueSkill ratings are permanently updated.
 
-Arguments:
+Arguments (ContentType must be `application/json`):
 
 ```
-players:
-  blue:
-    offense: ...
-    defense: ...
-  red:
-    offense: ...
-    defense: ...
-points:
-  blue: ...
-  red: ...
+{
+  "players": {
+    "blue": {
+      "offense": "",
+      "defense": ""
+    },
+    "red": {
+      "offense": "",
+      "defense": ""
+    }
+  },
+  "points": {
+    "blue": 10,
+    "red": 5
+  }
+}
 ```
 
 Returns:
 
 ```
-trueskill:
-  <player1_name>:
-    offense:
-      trueskill: <new trueskill rating>
-      trueskill_delta: <trueskill gain due to this match>
-    defense:
-      trueskill: <new trueskill rating>
-      trueskill_delta: <trueskill gain due to this match>
-    overall:
-      trueskill: <new trueskill rating>
-      trueskill_delta: <trueskill gain due to this match>
-  <player2_name>:
-    ...
-  <player3_name>:
-    ...
-  <player4_name>:
-    ...
+{
+  "players": {
+    "blue": {
+      "offense": {
+        "rating": 1000.0,
+        "rating_gain_overall": -30.0,
+        "rating_gain_offense": -30.0
+      },
+      "defense": {
+        "rating": 1000.0,
+        "rating_gain_overall": -30.0,
+        "rating_gain_defense": -30.0
+      }
+    },
+    "red": {
+      "offense": {
+        "rating": 1000.0,
+        "rating_gain_overall": 30.0,
+        "rating_gain_offense": 30.0
+      },
+      "defense": {
+        "rating": 1000.0,
+        "rating_gain_overall": 30.0,
+        "rating_gain_defense": 30.0
+      }
+    }
+  }
+}
 ```
 
 #### GET /kickerscore/api/v1/analyze_players
@@ -124,46 +186,55 @@ Analyzes some stats using just the players competing.
 
 Arguments:
 ```
-players:
-  - ...
-  - ...
-  - ...
-  - ...
+{
+  "players": ["a", "b", "c", "d"]
+}
 ```
 
 Returns:
 
 ```
-id: ...
-optimal_team_composition:
-  blue:
-    offense: ...
-    defense: ...
-  red:
-    offense: ...
-    defense: ...
-predicted_win_prob_for_blue: <probability that blue team will win this match given the optimal team composition is used>
-match_balance: <measure between 0 and 1 how balanced this match is, given the optimal team composition is used>
+{
+  "optimal_team_composition": {
+    "blue": {
+      "offense": "",
+      "defense": ""
+    },
+    "red": {
+      "offense": "",
+      "defense": ""
+    }
+  },
+  "predicted_win_prob_for_blue": <probability that blue team will win this match given the optimal team composition is used>,
+  "match_balance": <measure between 0 and 1 how balanced this match is, given the optimal team composition is used>
+}
 ```
 
 #### GET /kickerscore/api/v1/analyze_teams
 Predicts win chance of blue team and shows match balance.
 
 ```
-players:
-  blue:
-    offense: ...
-    defense: ...
-  red:
-    offense: ...
-    defense: ...
+{
+  "players": {
+    "blue": {
+      "offense": "",
+      "defense": ""
+    },
+    "red": {
+      "offense": "",
+      "defense": ""
+    }
+  }
+}
 ```
 
 Returns:
 
 ```
-predicted_win_prob_for_blue: ...
-match_balance: ...
+{
+  "predicted_win_prob_for_blue": 0.5,
+  "match_balance": 0.5
+}
 ```
 
 #### GET /kickerscore/api/v1/players
@@ -171,37 +242,47 @@ Shows all player names and their three current TrueSkill ratings.
 
 Returns:
 ```
-- username: ...
-  current_trueskills:
-    offensive: ...
-    defensive: ...
-    overall: ...
-  daily_trueskill_delta:
-    overall: ...
-  registration_date: ...
-  current_ranking_position: ...
-- ...
+[
+  {
+    "username": "",
+    "registration_date": datetime,
+    "current_trueskill": {
+      "overall": 1000,
+      "offense": 1000,
+      "defense": 1000
+    },
+    "current_uncertainty": {
+      "overall": 333.3,
+      "offense": 333.3,
+      "defense": 333.3
+    },
+    "rank_overall": 0,
+    "rank_offense": 1,
+    "rank_defense": 99
+  }
+]
 ```
 
-#### GET /kickerscore/api/v1/player/[username]
-Shows a player's TrueSkill history.
+#### GET /kickerscore/api/v1/player?username=[username]
+Shows a player's TrueSkill ratings.
 
 Returns:
 ```
-username: ...
-trueskills:
-  offensive:
-    - date: ...
-      rating: ...
-    - ...
-  defensive:
-    - date: ...
-      rating: ...
-    - ...
-  overall:
-    - date: ...
-      rating: ...
-    - ...
-registration_date: ...
-current_ranking_position: ...
+{
+  "username": "",
+  "registration_date": datetime,
+  "current_trueskill": {
+    "overall": 1000,
+    "offense": 1000,
+    "defense": 1000
+  },
+  "current_uncertainty": {
+    "overall": 333.3,
+    "offense": 333.3,
+    "defense": 333.3
+  },
+  "rank_overall": 0,
+  "rank_offense": 1,
+  "rank_defense": 99
+}
 ```
