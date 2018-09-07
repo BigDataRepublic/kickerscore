@@ -33,3 +33,4 @@ services:
     - POSTGRES_HOST=db
     - FLASK_APP=opt/app/app
     command: "flask db upgrade -d opt/app/migrations"
+    restart: on-failure

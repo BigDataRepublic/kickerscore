@@ -18,6 +18,11 @@ docker run -it kickerscore
 
 Make sure to have a postgres database running.
 
+To deploy using docker-compose:
+```
+docker-compose build && docker-compose up
+```
+
 To deploy on Kubernetes, including a database, service and ingress:
 ```
 kubectl apply -f deployment.yml
@@ -181,7 +186,7 @@ Returns:
 }
 ```
 
-#### GET /kickerscore/api/v1/analyze_players
+#### POST /kickerscore/api/v1/analyze_players
 Analyzes some stats using just the players competing.
 
 Arguments:
@@ -210,7 +215,7 @@ Returns:
 }
 ```
 
-#### GET /kickerscore/api/v1/analyze_teams
+#### POST /kickerscore/api/v1/analyze_teams
 Predicts win chance of blue team and shows match balance.
 
 ```
@@ -285,4 +290,19 @@ Returns:
   "rank_offense": 1,
   "rank_defense": 99
 }
+```
+
+#### POST /kickerscore/api/v1/player
+Creates a new player.
+
+Arguments:
+```json
+{
+  "username": ""
+}
+```
+
+Returns:
+```json
+"OK"
 ```
