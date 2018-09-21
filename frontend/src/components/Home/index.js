@@ -26,7 +26,7 @@ class Home extends Component {
         .map((player, i) => {
           return (
             <tr key={i}>
-              <td>{player[`rank_${position}`]}</td>
+              <td>{player[`rank_${position}`] + 1}</td>
               <td>{player.username}</td>
               <td>{Math.round(player.current_trueskill[`${position}`])}</td>
             </tr>
