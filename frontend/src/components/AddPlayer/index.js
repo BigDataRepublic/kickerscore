@@ -4,6 +4,7 @@ import AddPlayerForm from "./AddPlayerForm";
 
 class AddPlayer extends Component {
   constructor() {
+    super();
     this.state = {
       success: false
     }

@@ -2,8 +2,7 @@ import React, { Component } from "react";
 import { Button, Form, FormGroup, Label, Input } from "reactstrap";
 import axios from "axios";
 
-class AddBuildingForm extends Component {
-  // TODO: create function post player
+class AddPlayerForm extends Component {
   async createPlayer(e) {
     console.log("hit");
     e.preventDefault();
@@ -38,4 +37,4 @@ class AddBuildingForm extends Component {
   }
 }
 
-export default AddBuildingForm;
+export default AddPlayerForm;
