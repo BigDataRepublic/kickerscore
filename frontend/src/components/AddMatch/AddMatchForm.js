@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Button, Form, FormGroup, Label, Input, Row, Col, Media } from "reactstrap";
 import axios from "axios";
+import FoosballTablePicture from "./foosball_table.png";
 
 class AddMatchForm extends Component {
   async createMatch(e) {
@@ -37,23 +38,7 @@ class AddMatchForm extends Component {
       >
         <FormGroup>
           <Row>
-            <Col>
-              <h2>Red</h2>
-              <Label>Defense:</Label>
-              <Input
-                type="text"
-                name="redDefense"
-                innerRef={input => (this.redDefense = input)}
-                placeholder="with a placeholder"
-              />
-              <Label>Offense:</Label>
-              <Input
-                type="text"
-                name="redOffense"
-                innerRef={input => (this.redOffense = input)}
-                placeholder="with a placeholder"
-              />
-            </Col>
+            <Col></Col>
             <Col>
               <h2>Points</h2>
               <Row>
@@ -75,6 +60,31 @@ class AddMatchForm extends Component {
                   />
                 </Col>
               </Row>
+            </Col>
+            <Col></Col>
+          </Row>
+          <Row>
+            <Col>
+              <h2>Red</h2>
+              <Label>Defense:</Label>
+              <Input
+                type="text"
+                name="redDefense"
+                innerRef={input => (this.redDefense = input)}
+                placeholder="with a placeholder"
+              />
+              <Label>Offense:</Label>
+              <Input
+                type="text"
+                name="redOffense"
+                innerRef={input => (this.redOffense = input)}
+                placeholder="with a placeholder"
+              />
+            </Col>
+            <Col>
+              <Media left>
+        <Media object src={ FoosballTablePicture } alt="My PlaceHolder Picture" />
+      </Media>
             </Col>
             <Col>
               <h2>Blue</h2>
