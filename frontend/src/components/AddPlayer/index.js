@@ -1,17 +1,10 @@
 import React, { Component } from "react";
-import { Container, Row, Alert } from "reactstrap";
+import { Container, Row } from "reactstrap";
 import AddPlayerForm from "./AddPlayerForm";
 
 class AddPlayer extends Component {
-  constructor() {
-    super();
-    this.state = {
-      success: false
-    }
-  }
   render() {
     return (
-
       <Container>
         <Row>
           <h1>Add Player</h1>
