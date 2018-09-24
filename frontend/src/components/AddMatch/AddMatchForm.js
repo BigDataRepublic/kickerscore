@@ -120,7 +120,7 @@ class AddMatchForm extends Component {
                   <Input
                     type="text"
                     name="blueOffense"
-                    innerRef={input => (thiRedirect,s.blueOffense = input)}
+                    innerRef={input => (this.blueOffense = input)}
                     placeholder="with a placeholder"
                   />
                   <Label>Defense:</Label>
