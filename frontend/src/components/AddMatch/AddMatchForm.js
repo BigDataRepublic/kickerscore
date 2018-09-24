@@ -24,7 +24,7 @@ class AddMatchForm extends Component {
       }
     };
     const matchPost = await axios
-      .post(`http://localhost:5000/kickerscore/api/v1/match`, match)
+      .post("http://" + process.env.REACT_APP_API_HOST + ":" + process.env.REACT_APP_API_PORT + "/kickerscore/api/v1/match", match)
       .then()
       .catch();
     this.createMatchForm.reset();

@@ -14,7 +14,7 @@ class Home extends Component {
 
   async componentWillMount() {
     const { data } = await axios.get(
-      "http://localhost:5000/kickerscore/api/v1/players"
+      "http://" + process.env.REACT_APP_API_HOST + ":" + process.env.REACT_APP_API_PORT + "/kickerscore/api/v1/players"
     );
     this.setState({ players: data });
   }

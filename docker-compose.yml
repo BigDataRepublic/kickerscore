@@ -1,0 +1,48 @@
+version: '3'
+services:
+
+  api:
+    build: backend
+    ports:
+    - "5000:5000"
+    links:
+    - db
+    depends_on:
+    - db
+    environment:
+    - POSTGRES_USER=foo
+    - POSTGRES_PASSWORD=bar
+    - POSTGRES_HOST=db
+
+  db:
+    image: postgres
+    environment:
+    - POSTGRES_USER=foo
+    - POSTGRES_PASSWORD=bar
+    - POSTGRES_DB=kickerscore
+
+  migrator:
+    build: backend
+    links:
+    - db
+    depends_on:
+    - db
+    environment:
+    - POSTGRES_USER=foo
+    - POSTGRES_PASSWORD=bar
+    - POSTGRES_HOST=db
+    - FLASK_APP=opt/app/app
+    command: "flask db upgrade -d opt/app/migrations"
+    restart: on-failure
+
+  frontend:
+    build: frontend
+    ports:
+    - "3000:3000"
+    links:
+    - api
+    depends_on:
+    - api
+    environment:
+    - REACT_APP_API_HOST=localhost
+    - RACT_APP_API_PORT=5000

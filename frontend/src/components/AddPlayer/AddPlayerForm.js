@@ -10,7 +10,7 @@ class AddPlayerForm extends Component {
       username: this.name.value
     };
     const playerPost = await axios
-      .post(`http://localhost:5000/kickerscore/api/v1/player`, player)
+      .post("http://" + process.env.REACT_APP_API_HOST + ":" + process.env.REACT_APP_API_PORT + "/kickerscore/api/v1/player", player)
       .then()
       .catch();
     this.createPlayerForm.reset();
