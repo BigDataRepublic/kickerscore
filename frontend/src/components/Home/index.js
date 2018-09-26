@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import axios from "axios";
 import { Table } from "reactstrap";
 import { Container, Row, Col } from "reactstrap";
-import styled from "styled-components";
+import TopHeader from "../../helpers.js";
 
 class Home extends Component {
   constructor() {
@@ -71,9 +71,5 @@ class Home extends Component {
     );
   }
 }
-
-const TopHeader = styled.h1`
-  margin: 50px 0 20px 0;
-`
 
 export default Home;

@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Container, Row, Alert } from "reactstrap";
+import { Container, Row, Col } from "reactstrap";
 import AddMatchForm from "../AddMatch/AddMatchForm";
 import axios from "axios";
+import TopHeader from "../../helpers";
 
 class AddMatch extends Component {
   constructor() {
@@ -23,13 +24,16 @@ class AddMatch extends Component {
 
   render() {
     return (
-
       <Container>
         <Row>
-          <h1>Add Match</h1>
+          <Col>
+            <TopHeader>Add Match</TopHeader>
+          </Col>
         </Row>
         <Row>
+            <Col>
           <AddMatchForm />
+            </Col>
         </Row>
       </Container>
     );

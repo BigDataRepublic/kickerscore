@@ -1,16 +1,21 @@
 import React, { Component } from "react";
-import { Container, Row } from "reactstrap";
+import { Container, Row, Col } from "reactstrap";
 import AddPlayerForm from "./AddPlayerForm";
+import TopHeader from "../../helpers";
 
 class AddPlayer extends Component {
   render() {
     return (
       <Container>
         <Row>
-          <h1>Add Player</h1>
+          <Col>
+            <TopHeader>Add Player</TopHeader>
+          </Col>
         </Row>
         <Row>
+            <Col>
           <AddPlayerForm />
+            </Col>
         </Row>
       </Container>
     );
