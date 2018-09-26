@@ -12,16 +12,6 @@ class AddMatch extends Component {
     };
   }
 
-  async componentWillMount() {
-    const { data } = await axios.get(
-      "http://localhost:5000/kickerscore/api/v1/players"
-    );
-    this.setState({ players: data.map(player => {
-            return player.username;
-        })
-    });
-  }
-
   render() {
     return (
       <Container>

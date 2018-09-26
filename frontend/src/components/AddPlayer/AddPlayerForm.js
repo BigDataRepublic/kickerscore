@@ -22,6 +22,7 @@ class AddPlayerForm extends Component {
 
   async createPlayer(e) {
     e.preventDefault();
+    this.reset();
     const self = this;
     const player = {
       username: this.name.value

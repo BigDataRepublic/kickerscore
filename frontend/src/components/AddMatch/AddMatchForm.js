@@ -8,10 +8,24 @@ class AddMatchForm extends Component {
     super();
     this.state = {
       success: false,
-      fail: false
+      fail: false,
+      players: []
     };
 
     this.reset = this.reset.bind(this);
+    this.getSelectRows = this.getSelectRows.bind(this);
+  }
+
+  async componentWillMount() {
+    const { data } = await axios.get(
+      "http://localhost:5000/kickerscore/api/v1/players"
+    );
+    this.setState({ players: data
+            .sort((a, b) => ('' + a.username).localeCompare(b.username))
+            .map(player => {
+              return player.username;
+            })
+    });
   }
 
   reset() {
@@ -22,8 +36,8 @@ class AddMatchForm extends Component {
   }
 
   async createMatch(e) {
-    console.log("hit");
     e.preventDefault();
+    this.reset();
     const match = {
       players: {
         blue: {
@@ -54,6 +68,15 @@ class AddMatchForm extends Component {
         });
       });
     this.createMatchForm.reset();
+  }
+
+  getSelectRows() {
+      return [''].concat(this.state.players)
+        .map((player, i) => {
+          return (
+            <option key={i}>{player}</option>
+          );
+        });
   }
 
   render() {
@@ -96,18 +119,20 @@ class AddMatchForm extends Component {
                   <h2>Red</h2>
                   <Label>Defense:</Label>
                   <Input
-                    type="text"
+                    type="select"
                     name="redDefense"
                     innerRef={input => (this.redDefense = input)}
-                    placeholder="with a placeholder"
-                  />
+                    placeholder="with a placeholder">
+                      {this.getSelectRows()}
+                  </Input>
                   <Label>Offense:</Label>
                   <Input
-                    type="text"
+                    type="select"
                     name="redOffense"
                     innerRef={input => (this.redOffense = input)}
-                    placeholder="with a placeholder"
-                  />
+                    placeholder="with a placeholder">
+                      {this.getSelectRows()}
+                  </Input>
                 </Col>
                 <Col>
                   <Media left>
@@ -118,21 +143,25 @@ class AddMatchForm extends Component {
                   <h2>Blue</h2>
                   <Label>Offense:</Label>
                   <Input
-                    type="text"
+                    type="select"
                     name="blueOffense"
                     innerRef={input => (this.blueOffense = input)}
-                    placeholder="with a placeholder"
-                  />
+                    placeholder="with a placeholder">
+                      {this.getSelectRows()}
+                  </Input>
                   <Label>Defense:</Label>
                   <Input
-                    type="text"
+                    type="select"
                     name="blueDefense"
                     innerRef={input => (this.blueDefense = input)}
-                    placeholder="with a placeholder"
-                  />
+                    placeholder="with a placeholder">
+                      {this.getSelectRows()}
+                  </Input>
                 </Col>
               </Row>
-              <Button type="submit">Add Match → </Button>
+              <Row>
+                <Button type="submit">Add Match → </Button>
+              </Row>
             </FormGroup>
           </Form>
         </Row>
