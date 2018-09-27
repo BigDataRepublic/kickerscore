@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Button, Form, FormGroup, Label, Input, Col, Media, Container, Row, Alert } from "reactstrap";
 import axios from "axios";
 import FoosballTablePicture from "./foosball_table.png";
+import rangeInclusive from "range-inclusive";
 
 let imgStyle = {
   maxHeight: '325px',
@@ -16,13 +17,16 @@ class AddMatchForm extends Component {
         matchFail: false,
         analyzePlayersSuccess: false,
         analyzePlayersFail: false,
+        analyzeTeamsSuccess: false,
+        analyzeTeamsFail: false,
         players: [],
-        analysis: null
+        predicted_win_prob_for_blue: null,
     };
 
     this.reset = this.reset.bind(this);
     this.getSelectRows = this.getSelectRows.bind(this);
     this.balanceTeams = this.balanceTeams.bind(this);
+    this.getOdds = this.getOdds.bind(this);
   }
 
   async componentWillMount() {
@@ -43,7 +47,40 @@ class AddMatchForm extends Component {
       matchFail: false,
       analyzePlayersSuccess: false,
       analyzePlayersFail: false,
+      analyzeTeamsSuccess: false,
+      analyzeTeamsFail: false
     });
+  }
+
+  async getOdds() {
+    this.reset();
+    const analyzeTeams = {
+        players: {
+            blue: {
+                offense: this.blueOffense.value,
+                defense: this.blueDefense.value,
+            },
+            red: {
+                offense: this.redOffense.value,
+                defense: this.redDefense.value,
+            }
+        }
+    };
+
+    const self = this;
+    await axios
+      .post("http://" + process.env.REACT_APP_API_HOST + ":" + process.env.REACT_APP_API_PORT + "/kickerscore/api/v1/analyze-teams", analyzeTeams)
+      .then(function (response) {
+        self.setState({
+          analyzeTeamsSuccess: true,
+          predicted_win_prob_for_blue: response.data.predicted_win_prob_for_blue
+        });
+      })
+      .catch(function () {
+        self.setState({
+          analyzeTeamsFail: true
+        });
+      });
   }
 
   async balanceTeams() {
@@ -61,18 +98,16 @@ class AddMatchForm extends Component {
     await axios
       .post("http://" + process.env.REACT_APP_API_HOST + ":" + process.env.REACT_APP_API_PORT + "/kickerscore/api/v1/analyze-players", analyzePlayers)
       .then(function (response) {
-        console.log('then');
         self.setState({
           analyzePlayersSuccess: true,
-          analysis: response.data
+          predicted_win_prob_for_blue: response.data.predicted_win_prob_for_blue
         });
-        self.blueOffense.value = self.state.analysis.optimal_team_composition.blue.offense;
-        self.redOffense.value = self.state.analysis.optimal_team_composition.red.offense;
-        self.blueDefense.value = self.state.analysis.optimal_team_composition.blue.defense;
-        self.redDefense.value = self.state.analysis.optimal_team_composition.red.defense;
+        self.blueOffense.value = response.data.optimal_team_composition.blue.offense;
+        self.redOffense.value = response.data.optimal_team_composition.red.offense;
+        self.blueDefense.value = response.data.optimal_team_composition.blue.defense;
+        self.redDefense.value = response.data.optimal_team_composition.red.defense;
       })
       .catch(function () {
-        console.log('fail');
         self.setState({
           analyzePlayersFail: true
         });
@@ -124,6 +159,15 @@ class AddMatchForm extends Component {
         });
   }
 
+  getPointRange() {
+      return [''].concat(rangeInclusive(0,20,1))
+        .map((player, i) => {
+          return (
+            <option key={i}>{player}</option>
+          );
+        });
+  }
+
   render() {
     return (
       <Container>
@@ -142,20 +186,24 @@ class AddMatchForm extends Component {
                   <Row>
                     <Col>
                       <Input
-                        type="text"
+                        type="select"
                         name="redPoints"
                         innerRef={input => (this.redPoints = input)}
                         placeholder="with a placeholder"
-                      />
+                      >
+                        {this.getPointRange()}
+                      </Input>
                     </Col>
                       <h2>-</h2>
                     <Col>
                       <Input
-                        type="text"
+                        type="select"
                         name="bluePoints"
                         innerRef={input => (this.bluePoints = input)}
                         placeholder="with a placeholder"
-                      />
+                      >
+                          {this.getPointRange()}
+                      </Input>
                     </Col>
                   </Row>
                 </Col>
@@ -207,7 +255,7 @@ class AddMatchForm extends Component {
                 </Col>
               </Row>
               <div>
-                  {this.state.analysis ?
+                  {this.state.predicted_win_prob_for_blue ?
                 <Container>
                     <Row>
                   <Col />
@@ -219,7 +267,7 @@ class AddMatchForm extends Component {
                 <Row>
                   <Col />
                   <Col>
-                    <h3>{100 - Math.round(this.state.analysis.predicted_win_prob_for_blue * 100)} - {Math.round(this.state.analysis.predicted_win_prob_for_blue * 100)}</h3>
+                    <h3>{100 - Math.round(this.state.predicted_win_prob_for_blue * 100)} - {Math.round(this.state.predicted_win_prob_for_blue * 100)}</h3>
                   </Col>
                   <Col />
                 </Row>
@@ -231,6 +279,9 @@ class AddMatchForm extends Component {
                 <Col style={{marginLeft: '20px'}}>
                     <Row>
                   <Button onClick={this.balanceTeams}>Balance Teams → </Button>
+                    </Row>
+                    <Row style={{marginTop: '20px'}}>
+                  <Button onClick={this.getOdds}>Compute Odds → </Button>
                     </Row>
                     <Row style={{marginTop: '20px'}}>
                   <Button type="submit">Add Match → </Button>
@@ -252,6 +303,12 @@ class AddMatchForm extends Component {
         </div>
         <div onClick={this.reset}>
           {this.state.analyzePlayersFail ? <Row><Alert color="danger">Something went wrong</Alert></Row> : null}
+        </div>
+        <div onClick={this.reset}>
+          {this.state.analyzeTeamsSuccess ? <Row><Alert color="success">Odds Computed</Alert></Row> : null}
+        </div>
+        <div onClick={this.reset}>
+          {this.state.analyzeTeamsFail ? <Row><Alert color="danger">Something went wrong</Alert></Row> : null}
         </div>
       </Container>
     );
