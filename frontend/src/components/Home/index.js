@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import axios from "axios";
 import { Table } from "reactstrap";
 import { Container, Row, Col } from "reactstrap";
-import TopHeader from "../../helpers.js";
+import TopHeader from "../../shared/helpers.js";
 
 class Home extends Component {
   constructor() {

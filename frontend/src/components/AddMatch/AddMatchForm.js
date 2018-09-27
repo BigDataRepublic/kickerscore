@@ -3,22 +3,31 @@ import { Button, Form, FormGroup, Label, Input, Col, Media, Container, Row, Aler
 import axios from "axios";
 import FoosballTablePicture from "./foosball_table.png";
 
+let imgStyle = {
+  maxHeight: '325px',
+  maxWidth: '325px'
+};
+
 class AddMatchForm extends Component {
   constructor() {
     super();
     this.state = {
-      success: false,
-      fail: false,
-      players: []
+        matchSuccess: false,
+        matchFail: false,
+        analyzePlayersSuccess: false,
+        analyzePlayersFail: false,
+        players: [],
+        analysis: null
     };
 
     this.reset = this.reset.bind(this);
     this.getSelectRows = this.getSelectRows.bind(this);
+    this.balanceTeams = this.balanceTeams.bind(this);
   }
 
   async componentWillMount() {
     const { data } = await axios.get(
-      "http://localhost:5000/kickerscore/api/v1/players"
+      "http://" + process.env.REACT_APP_API_HOST + ":" + process.env.REACT_APP_API_PORT + "/kickerscore/api/v1/players"
     );
     this.setState({ players: data
             .sort((a, b) => ('' + a.username).localeCompare(b.username))
@@ -30,9 +39,44 @@ class AddMatchForm extends Component {
 
   reset() {
     this.setState({
-      success: false,
-      fail: false
+      matchSuccess: false,
+      matchFail: false,
+      analyzePlayersSuccess: false,
+      analyzePlayersFail: false,
     });
+  }
+
+  async balanceTeams() {
+    this.reset();
+    const analyzePlayers = {
+      players: [
+        this.blueOffense.value,
+        this.redOffense.value,
+        this.blueDefense.value,
+        this.redDefense.value
+      ]
+    };
+
+    const self = this;
+    await axios
+      .post("http://" + process.env.REACT_APP_API_HOST + ":" + process.env.REACT_APP_API_PORT + "/kickerscore/api/v1/analyze-players", analyzePlayers)
+      .then(function (response) {
+        console.log('then');
+        self.setState({
+          analyzePlayersSuccess: true,
+          analysis: response.data
+        });
+        self.blueOffense.value = self.state.analysis.optimal_team_composition.blue.offense;
+        self.redOffense.value = self.state.analysis.optimal_team_composition.red.offense;
+        self.blueDefense.value = self.state.analysis.optimal_team_composition.blue.defense;
+        self.redDefense.value = self.state.analysis.optimal_team_composition.red.defense;
+      })
+      .catch(function () {
+        console.log('fail');
+        self.setState({
+          analyzePlayersFail: true
+        });
+      });
   }
 
   async createMatch(e) {
@@ -55,16 +99,17 @@ class AddMatchForm extends Component {
       }
     };
     const self = this;
-    const matchPost = await axios
+    await axios
       .post("http://" + process.env.REACT_APP_API_HOST + ":" + process.env.REACT_APP_API_PORT + "/kickerscore/api/v1/match", match)
       .then(function () {
         self.setState({
-          success: true
+          matchSuccess: true,
+          analysis: null
         });
       })
       .catch(function () {
         self.setState({
-          fail: true
+          matchFail: true
         });
       });
     this.createMatchForm.reset();
@@ -88,6 +133,8 @@ class AddMatchForm extends Component {
             onSubmit={e => this.createMatch(e)}
           >
             <FormGroup>
+              <Row>
+              <Col>
               <Row>
                 <Col></Col>
                 <Col>
@@ -136,7 +183,7 @@ class AddMatchForm extends Component {
                 </Col>
                 <Col>
                   <Media left>
-            <Media object src={ FoosballTablePicture } alt="My PlaceHolder Picture" />
+            <Media style={imgStyle} object src={ FoosballTablePicture } alt="My PlaceHolder Picture" />
           </Media>
                 </Col>
                 <Col>
@@ -159,17 +206,52 @@ class AddMatchForm extends Component {
                   </Input>
                 </Col>
               </Row>
+              <div>
+                  {this.state.analysis ?
+                <Container>
+                    <Row>
+                  <Col />
+                  <Col>
+                    <h2>Odds</h2>
+                  </Col>
+                  <Col />
+                </Row>
+                <Row>
+                  <Col />
+                  <Col>
+                    <h3>{100 - Math.round(this.state.analysis.predicted_win_prob_for_blue * 100)} - {Math.round(this.state.analysis.predicted_win_prob_for_blue * 100)}</h3>
+                  </Col>
+                  <Col />
+                </Row>
+                </Container>
+                      : null}
+              </div>
+              </Col>
               <Row>
-                <Button type="submit">Add Match → </Button>
+                <Col style={{marginLeft: '20px'}}>
+                    <Row>
+                  <Button onClick={this.balanceTeams}>Balance Teams → </Button>
+                    </Row>
+                    <Row style={{marginTop: '20px'}}>
+                  <Button type="submit">Add Match → </Button>
+                    </Row>
+                </Col>
+              </Row>
               </Row>
             </FormGroup>
           </Form>
         </Row>
         <div onClick={this.reset}>
-          {this.state.success ? <Row><Alert color="success">Match Added</Alert></Row> : null}
+          {this.state.matchSuccess ? <Row><Alert color="success">Match Added</Alert></Row> : null}
         </div>
         <div onClick={this.reset}>
-          {this.state.fail ? <Row><Alert color="danger">Something went wrong</Alert></Row> : null}
+          {this.state.matchFail ? <Row><Alert color="danger">Something went wrong</Alert></Row> : null}
+        </div>
+        <div onClick={this.reset}>
+          {this.state.analyzePlayersSuccess ? <Row><Alert color="success">Teams Balanced</Alert></Row> : null}
+        </div>
+        <div onClick={this.reset}>
+          {this.state.analyzePlayersFail ? <Row><Alert color="danger">Something went wrong</Alert></Row> : null}
         </div>
       </Container>
     );

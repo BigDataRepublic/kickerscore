@@ -31,8 +31,8 @@ api.add_resource(MatchesResource, '/kickerscore/api/v1/matches')
 api.add_resource(MatchResource, '/kickerscore/api/v1/match')
 api.add_resource(PlayersResource, '/kickerscore/api/v1/players')
 api.add_resource(PlayerResource, '/kickerscore/api/v1/player')
-api.add_resource(AnalyzePlayers, '/kickerscore/api/v1/analyze_players')
-api.add_resource(AnalyzeTeams, '/kickerscore/api/v1/analyze_teams')
+api.add_resource(AnalyzePlayers, '/kickerscore/api/v1/analyze-players')
+api.add_resource(AnalyzeTeams, '/kickerscore/api/v1/analyze-teams')
 api.add_resource(Healthz, '/healthz')
 
 if __name__ == '__main__':

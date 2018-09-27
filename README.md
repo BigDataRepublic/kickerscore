@@ -186,7 +186,7 @@ Returns:
 }
 ```
 
-#### POST /kickerscore/api/v1/analyze_players
+#### POST /kickerscore/api/v1/analyze-players
 Analyzes some stats using just the players competing.
 
 Arguments:
@@ -215,7 +215,7 @@ Returns:
 }
 ```
 
-#### POST /kickerscore/api/v1/analyze_teams
+#### POST /kickerscore/api/v1/analyze-teams
 Predicts win chance of blue team and shows match balance.
 
 ```

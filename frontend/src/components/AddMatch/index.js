@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import { Container, Row, Col } from "reactstrap";
 import AddMatchForm from "../AddMatch/AddMatchForm";
-import axios from "axios";
-import TopHeader from "../../helpers";
+import TopHeader from "../../shared/helpers";
 
 class AddMatch extends Component {
   constructor() {
