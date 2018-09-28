@@ -141,13 +141,13 @@ class AddMatchForm extends Component {
           matchSuccess: true,
           analysis: null
         });
+        self.createMatchForm.reset();
       })
       .catch(function () {
         self.setState({
           matchFail: true
         });
       });
-    this.createMatchForm.reset();
   }
 
   getSelectRows() {
