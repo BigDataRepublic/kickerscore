@@ -22,7 +22,7 @@ class MatchResource(Resource):
         match = Match.query.filter_by(id=args['id']).first()
 
         if match is None:
-            return f"Match with id {args['id']} not found", 404
+            return f"AddMatch with id {args['id']} not found", 404
 
         return match.serialize(), 200
 
