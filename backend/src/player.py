@@ -16,11 +16,12 @@ class PlayerResource(Resource):
         parser.add_argument('username', type=str)
 
         args = parser.parse_args()
+        username = args['username'].lower()
 
-        player = Player.query.filter_by(username=args['username']).first()
+        player = Player.query.filter_by(username=username).first()
 
         if player is None:
-            return f"Player with username {args['username']} not found", 404
+            return f"Player with username {username} not found", 404
 
         return player.serialize()
 
@@ -29,13 +30,14 @@ class PlayerResource(Resource):
         parser.add_argument('username', type=str)
 
         args = parser.parse_args()
+        username = args['username'].lower()
 
         # Check if player already exists
-        if Player.query.filter_by(username=args['username']).count() > 0:
+        if Player.query.filter_by(username=username).count() > 0:
             return "Player already exists", 409
 
         player = Player()
-        player.username = args['username']
+        player.username = username
         player.rating_mu = MU
         player.rating_mu_offense = MU
         player.rating_mu_defense = MU
