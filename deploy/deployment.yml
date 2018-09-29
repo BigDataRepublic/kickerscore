@@ -39,6 +39,23 @@ spec:
 
 ---
 apiVersion: v1
+kind: Service
+metadata:
+  name: kickerscore-frontend-service
+  namespace: kickerscore
+  labels:
+    app: kickerscore
+    tier: frontend
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+  selector:
+    app: kickerscore
+    tier: frontend
+
+---
+apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: kickerscore-pv
@@ -130,7 +147,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kickerscore-deployment
+  name: kickerscore-backend-deployment
   namespace: kickerscore
   labels:
     app: kickerscore
@@ -150,7 +167,22 @@ spec:
       initContainers:
         - name: kickerscore-db-migrate
           image: 10.8.0.1:30000/sreitsma/kickerscore:latest
-          command: ["cd /opt/app && flask db upgrade"]
+          command: ["flask", "db", "upgrade", "-d", "/opt/app/migrations"]
+          env:
+            - name: "POSTGRES_HOST"
+              value: "kickerscore-db-service.kickerscore.svc.cluster.local"
+            - name: "POSTGRES_USER"
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+            - name: "POSTGRES_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+            - name: "FLASK_APP"
+              value: "/opt/app/app"
       containers:
       - name: kickerscore-backend
         image: 10.8.0.1:30000/sreitsma/kickerscore:latest
@@ -171,6 +203,8 @@ spec:
           initialDelaySeconds: 15
           periodSeconds: 15
         env:
+          - name: "POSTGRES_HOST"
+            value: "kickerscore-db-service.kickerscore.svc.cluster.local"
           - name: "POSTGRES_USER"
             valueFrom:
               secretKeyRef:
@@ -181,12 +215,60 @@ spec:
               secretKeyRef:
                 name: postgres-secret
                 key: password
+          - name: "FLASK_APP"
+            value: "/opt/app/app"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kickerscore-frontend-deployment
+  namespace: kickerscore
+  labels:
+    app: kickerscore
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kickerscore
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: kickerscore
+        tier: frontend
+    spec:
+      containers:
+      - name: kickerscore-frontend
+        image: 10.8.0.1:30000/sreitsma/kickerscore-frontend:latest
+        ports:
+          - containerPort: 3000
+        resources:
+          limits:
+            nvidia.com/gpu: 0
+            memory: "1024Mi"
+            cpu: "1"
+          requests:
+            memory: "256Mi"
+            cpu: "0.1"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 15
+        env:
+          - name: "REACT_APP_API_HOST"
+            value: "192.168.3.9"
+          - name: "REACT_APP_API_PORT"
+            value: "5000"
 
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: kickerscore-ingress
+  name: kickerscore-backend-ingress
   namespace: kickerscore
 spec:
   rules:
@@ -196,3 +278,18 @@ spec:
         backend:
           serviceName: kickerscore-backend-service
           servicePort: 5000
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kickerscore-frontend-ingress
+  namespace: kickerscore
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /ks
+        backend:
+          serviceName: kickerscore-frontend-service
+          servicePort: 3000
