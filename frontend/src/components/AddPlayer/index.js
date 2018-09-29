@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Container, Row, Col } from "reactstrap";
 import AddPlayerForm from "./AddPlayerForm";
-import TopHeader from "../../shared/helpers";
+import TopHeader from "../../shared/components";
 
 class AddPlayer extends Component {
   render() {

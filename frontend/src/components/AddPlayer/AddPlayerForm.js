@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Button, Form, FormGroup, Label, Input, Alert, Row, Container } from "reactstrap";
 import axios from "axios";
+import {apiUrl} from "../../shared/urls"
 
 class AddPlayerForm extends Component {
   constructor() {
@@ -28,7 +29,7 @@ class AddPlayerForm extends Component {
       username: this.name.value
     };
     const playerPost = await axios
-      .post("http://" + process.env.REACT_APP_API_HOST + ":" + process.env.REACT_APP_API_PORT + "/kickerscore/api/v1/player", player)
+      .post(apiUrl + "/kickerscore/api/v1/player", player)
       .then(function () {
         self.setState({
             success: true
