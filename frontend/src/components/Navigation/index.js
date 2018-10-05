@@ -13,6 +13,11 @@ let imgStyle = {
   maxWidth: '64px'
 };
 
+let navFontStyle = {
+  fontSize: '37px',
+  margin: '0 0 0 100px'
+};
+
 export default class Navigation extends React.Component {
   constructor(props) {
     super(props);
@@ -38,13 +43,13 @@ export default class Navigation extends React.Component {
           </NavbarBrand>
             <Nav className="ml-auto" navbar>
           <NavItem>
-            <NavLink href="/">Leaderboard</NavLink>
+            <NavLink href="/"><div style={navFontStyle}>Leaderboard</div></NavLink>
           </NavItem>
           <NavItem>
-            <NavLink href="/add-match/">Add Match</NavLink>
+            <NavLink href="/add-match/"><div style={navFontStyle}>Add Match</div></NavLink>
           </NavItem>
           <NavItem>
-            <NavLink href="/add-player/">Add Player</NavLink>
+            <NavLink href="/add-player/"><div style={navFontStyle}>Add Player</div></NavLink>
           </NavItem>
             </Nav>
         </Navbar>
