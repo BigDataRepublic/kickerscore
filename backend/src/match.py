@@ -39,19 +39,24 @@ class MatchResource(Resource):
 
         # Create match and set players and points
         match = Match()
-        match.blue_offense_player = players['blue']['offense']
-        match.blue_defense_player = players['blue']['defense']
-        match.red_offense_player = players['red']['offense']
-        match.red_defense_player = players['red']['defense']
+        match.blue_offense_player = players['blue']['offense'].lower()
+        match.blue_defense_player = players['blue']['defense'].lower()
+        match.red_offense_player = players['red']['offense'].lower()
+        match.red_defense_player = players['red']['defense'].lower()
 
-        match.blue_points = points['blue']
-        match.red_points = points['red']
+        list_of_players = [match.blue_offense_player, match.blue_defense_player, match.red_offense_player, match.red_defense_player]
+        if len(set(list_of_players)) != len(list_of_players):
+            # Duplicate players
+            return "There are duplicate players in your request", 400
+
+        match.blue_points = int(points['blue'])
+        match.red_points = int(points['red'])
 
         # Set match balance and predicted win probability
-        player_blue_offense = Player.query.filter_by(username=players['blue']['offense']).first()
-        player_blue_defense = Player.query.filter_by(username=players['blue']['defense']).first()
-        player_red_offense = Player.query.filter_by(username=players['red']['offense']).first()
-        player_red_defense = Player.query.filter_by(username=players['red']['defense']).first()
+        player_blue_offense = Player.query.filter_by(username=players['blue']['offense'].lower()).first()
+        player_blue_defense = Player.query.filter_by(username=players['blue']['defense'].lower()).first()
+        player_red_offense = Player.query.filter_by(username=players['red']['offense'].lower()).first()
+        player_red_defense = Player.query.filter_by(username=players['red']['defense'].lower()).first()
 
         stats = analysis.analyze_teams(player_blue_offense, player_blue_defense, player_red_offense, player_red_defense)
 
@@ -69,7 +74,7 @@ class MatchResource(Resource):
         red_team = [player_red_offense_old_rating_overall, player_red_defense_old_rating_overall]
 
         # Team points are intentionally reverted!
-        (player_blue_offense_new_rating_overall, player_blue_defense_new_rating_overall), (player_red_offense_new_rating_overall, player_red_defense_new_rating_overall) = rate([blue_team, red_team], ranks=[points['red'], points['blue']])
+        (player_blue_offense_new_rating_overall, player_blue_defense_new_rating_overall), (player_red_offense_new_rating_overall, player_red_defense_new_rating_overall) = rate([blue_team, red_team], ranks=[match.red_points, match.blue_points])
 
         # Calculate new ratings for players (OFFENSE/DEFENSE)
         player_blue_offense_old_rating_offense = Rating(mu=player_blue_offense.rating_mu_offense, sigma=player_blue_offense.rating_sigma_offense)
@@ -82,7 +87,7 @@ class MatchResource(Resource):
         red_team = [player_red_offense_old_rating_offense, player_red_defense_old_rating_defense]
 
         # Team points are intentionally reverted!
-        (player_blue_offense_new_rating_offense, player_blue_defense_new_rating_defense), (player_red_offense_new_rating_offense, player_red_defense_new_rating_defense) = rate([blue_team, red_team], ranks=[points['red'], points['blue']])
+        (player_blue_offense_new_rating_offense, player_blue_defense_new_rating_defense), (player_red_offense_new_rating_offense, player_red_defense_new_rating_defense) = rate([blue_team, red_team], ranks=[match.red_points, match.blue_points])
 
         # Calculate deltas
         match.blue_offense_player_skill_gain_overall = player_blue_offense_new_rating_overall.mu - player_blue_offense_old_rating_overall.mu
