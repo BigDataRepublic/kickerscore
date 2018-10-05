@@ -3,7 +3,6 @@ import { Button, Form, FormGroup, Label, Input, Col, Media, Container, Row, Aler
 import axios from "axios";
 import FoosballTablePicture from "./foosball_table.png";
 import rangeInclusive from "range-inclusive";
-import {apiUrl} from "../../shared/urls"
 
 let imgStyle = {
   maxHeight: '325px',
@@ -31,9 +30,8 @@ class AddMatchForm extends Component {
   }
 
   async componentWillMount() {
-    console.log(apiUrl);
     const { data } = await axios.get(
-      apiUrl + "/kickerscore/api/v1/players"
+      process.env.REACT_APP_API_URL + "/kickerscore/api/v1/players"
     );
     this.setState({ players: data
             .sort((a, b) => ('' + a.username).localeCompare(b.username))
@@ -55,6 +53,13 @@ class AddMatchForm extends Component {
   }
 
   async getOdds() {
+    if (this.blueDefense.value.length == 0 ||
+        this.blueOffense.value.length == 0 ||
+        this.redDefense.value.length == 0 ||
+        this.redOffense.value.length == 0) {
+        return
+    }
+
     this.reset();
     const analyzeTeams = {
         players: {
@@ -71,7 +76,7 @@ class AddMatchForm extends Component {
 
     const self = this;
     await axios
-      .post(apiUrl + "/kickerscore/api/v1/analyze-teams", analyzeTeams)
+      .post(process.env.REACT_APP_API_URL + "/kickerscore/api/v1/analyze-teams", analyzeTeams)
       .then(function (response) {
         self.setState({
           analyzeTeamsSuccess: true,
@@ -98,7 +103,7 @@ class AddMatchForm extends Component {
 
     const self = this;
     await axios
-      .post(apiUrl + "/kickerscore/api/v1/analyze-players", analyzePlayers)
+      .post(process.env.REACT_APP_API_URL + "/kickerscore/api/v1/analyze-players", analyzePlayers)
       .then(function (response) {
         self.setState({
           analyzePlayersSuccess: true,
@@ -137,7 +142,7 @@ class AddMatchForm extends Component {
     };
     const self = this;
     await axios
-      .post(apiUrl + "/kickerscore/api/v1/match", match)
+      .post(process.env.REACT_APP_API_URL + "/kickerscore/api/v1/match", match)
       .then(function () {
         self.setState({
           matchSuccess: true,
@@ -219,7 +224,8 @@ class AddMatchForm extends Component {
                     type="select"
                     name="redDefense"
                     innerRef={input => (this.redDefense = input)}
-                    placeholder="with a placeholder">
+                    placeholder="with a placeholder"
+                    onChange={this.getOdds}>
                       {this.getSelectRows()}
                   </Input>
                   <Label>Offense:</Label>
@@ -227,7 +233,8 @@ class AddMatchForm extends Component {
                     type="select"
                     name="redOffense"
                     innerRef={input => (this.redOffense = input)}
-                    placeholder="with a placeholder">
+                    placeholder="with a placeholder"
+                    onChange={this.getOdds}>
                       {this.getSelectRows()}
                   </Input>
                 </Col>
@@ -243,7 +250,8 @@ class AddMatchForm extends Component {
                     type="select"
                     name="blueOffense"
                     innerRef={input => (this.blueOffense = input)}
-                    placeholder="with a placeholder">
+                    placeholder="with a placeholder"
+                    onChange={this.getOdds}>
                       {this.getSelectRows()}
                   </Input>
                   <Label>Defense:</Label>
@@ -251,7 +259,8 @@ class AddMatchForm extends Component {
                     type="select"
                     name="blueDefense"
                     innerRef={input => (this.blueDefense = input)}
-                    placeholder="with a placeholder">
+                    placeholder="with a placeholder"
+                    onChange={this.getOdds}>
                       {this.getSelectRows()}
                   </Input>
                 </Col>
@@ -281,9 +290,6 @@ class AddMatchForm extends Component {
                 <Col style={{marginLeft: '20px'}}>
                     <Row>
                   <Button onClick={this.balanceTeams}>Balance Teams → </Button>
-                    </Row>
-                    <Row style={{marginTop: '20px'}}>
-                  <Button onClick={this.getOdds}>Compute Odds → </Button>
                     </Row>
                     <Row style={{marginTop: '20px'}}>
                   <Button type="submit">Add Match → </Button>

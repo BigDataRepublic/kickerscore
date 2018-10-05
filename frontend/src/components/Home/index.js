@@ -3,7 +3,6 @@ import axios from "axios";
 import { Table } from "reactstrap";
 import { Container, Row, Col } from "reactstrap";
 import TopHeader from "../../shared/components.js";
-import {apiUrl} from "../../shared/urls"
 
 class Home extends Component {
   constructor() {
@@ -29,7 +28,7 @@ class Home extends Component {
 
   async getPlayers() {
     const { data } = await axios.get(
-      apiUrl + "/kickerscore/api/v1/players"
+      process.env.REACT_APP_API_URL + "/kickerscore/api/v1/players"
     );
     this.setState({ players: data });
   }
