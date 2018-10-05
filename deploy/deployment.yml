@@ -97,6 +97,16 @@ data:
   password: "[hidden for git]"
 
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: basic-auth-secret
+  namespace: kickerscore
+type: Opaque
+data:
+  auth: "[hidden for git]"
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -260,9 +270,11 @@ spec:
           periodSeconds: 15
         env:
           - name: "REACT_APP_API_HOST"
-            value: "192.168.3.9"
+            value: "10.8.0.1"
           - name: "REACT_APP_API_PORT"
-            value: "5000"
+            value: "80"
+          - name: "REACT_APP_API_SUBDIR"
+            value: ""
 
 ---
 apiVersion: extensions/v1beta1
@@ -270,6 +282,9 @@ kind: Ingress
 metadata:
   name: kickerscore-backend-ingress
   namespace: kickerscore
+  annotations:
+    traefik.ingress.kubernetes.io/auth-type: "basic"
+    traefik.ingress.kubernetes.io/auth-secret: "basic-auth-secret"
 spec:
   rules:
   - http:
@@ -285,11 +300,14 @@ kind: Ingress
 metadata:
   name: kickerscore-frontend-ingress
   namespace: kickerscore
+  annotations:
+    traefik.ingress.kubernetes.io/auth-type: "basic"
+    traefik.ingress.kubernetes.io/auth-secret: "basic-auth-secret"
 spec:
   rules:
   - http:
       paths:
-      - path: /ks
+      - path: /
         backend:
           serviceName: kickerscore-frontend-service
           servicePort: 3000

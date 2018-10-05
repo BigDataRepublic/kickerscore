@@ -37,4 +37,4 @@ api.add_resource(AnalyzeTeams, '/kickerscore/api/v1/analyze-teams')
 api.add_resource(Healthz, '/healthz')
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=False, host="0.0.0.0", port=5000, threaded=True)
