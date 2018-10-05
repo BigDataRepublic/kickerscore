@@ -27,7 +27,6 @@ class Healthz(Resource):
         return "OK", 200
 
 
-
 api.add_resource(MatchesResource, '/kickerscore/api/v1/matches')
 api.add_resource(MatchResource, '/kickerscore/api/v1/match')
 api.add_resource(PlayersResource, '/kickerscore/api/v1/players')
