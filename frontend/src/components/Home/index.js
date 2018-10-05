@@ -13,6 +13,7 @@ class Home extends Component {
   }
 
   componentDidMount() {
+    this.getPlayers();
     this.intervalID = setInterval(
       () => this.getPlayers(),
       10000
@@ -23,7 +24,6 @@ class Home extends Component {
   componentWillUnmount() {
     clearInterval(this.intervalID);
   }
-
 
 
   async getPlayers() {
