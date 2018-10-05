@@ -12,7 +12,21 @@ class Home extends Component {
     };
   }
 
-  async componentWillMount() {
+  componentDidMount() {
+    this.intervalID = setInterval(
+      () => this.getPlayers(),
+      10000
+    );
+
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.intervalID);
+  }
+
+
+
+  async getPlayers() {
     const { data } = await axios.get(
       "/kickerscore/api/v1/players"
     );
