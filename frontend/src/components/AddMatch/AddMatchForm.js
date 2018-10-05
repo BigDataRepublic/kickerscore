@@ -3,7 +3,6 @@ import { Button, Form, FormGroup, Label, Input, Col, Media, Container, Row, Aler
 import axios from "axios";
 import FoosballTablePicture from "./foosball_table.png";
 import rangeInclusive from "range-inclusive";
-import {apiUrl} from "../../shared/urls"
 
 let imgStyle = {
   maxHeight: '325px',
@@ -31,9 +30,8 @@ class AddMatchForm extends Component {
   }
 
   async componentWillMount() {
-    console.log(apiUrl);
     const { data } = await axios.get(
-      apiUrl + "/kickerscore/api/v1/players"
+      "/kickerscore/api/v1/players"
     );
     this.setState({ players: data
             .sort((a, b) => ('' + a.username).localeCompare(b.username))
@@ -71,7 +69,7 @@ class AddMatchForm extends Component {
 
     const self = this;
     await axios
-      .post(apiUrl + "/kickerscore/api/v1/analyze-teams", analyzeTeams)
+      .post("/kickerscore/api/v1/analyze-teams", analyzeTeams)
       .then(function (response) {
         self.setState({
           analyzeTeamsSuccess: true,
@@ -98,7 +96,7 @@ class AddMatchForm extends Component {
 
     const self = this;
     await axios
-      .post(apiUrl + "/kickerscore/api/v1/analyze-players", analyzePlayers)
+      .post("/kickerscore/api/v1/analyze-players", analyzePlayers)
       .then(function (response) {
         self.setState({
           analyzePlayersSuccess: true,
@@ -137,7 +135,7 @@ class AddMatchForm extends Component {
     };
     const self = this;
     await axios
-      .post(apiUrl + "/kickerscore/api/v1/match", match)
+      .post("/kickerscore/api/v1/match", match)
       .then(function () {
         self.setState({
           matchSuccess: true,
