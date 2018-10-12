@@ -15,11 +15,6 @@ class AddMatch extends Component {
     return (
       <Container>
         <Row>
-          <Col>
-            <TopHeader>Add Match</TopHeader>
-          </Col>
-        </Row>
-        <Row>
             <Col>
           <AddMatchForm />
             </Col>

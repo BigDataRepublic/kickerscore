@@ -5,11 +5,13 @@
   "dependencies": {
     "axios": "^0.18.0",
     "bootstrap": "^4.1.3",
+    "d3": "^5.7.0",
     "range-inclusive": "^1.0.2",
     "react": "^16.5.1",
     "react-dom": "^16.5.1",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "1.1.5",
+    "react-scripts": "2.0.3",
+    "react-svg": "^6.0.17",
     "reactstrap": "^6.4.0",
     "styled-components": "^3.4.6"
   },
@@ -18,5 +20,11 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
