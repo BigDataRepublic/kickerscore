@@ -1,24 +1,18 @@
 import React, { Component } from "react";
 import {
-  Button,
-  Form,
-  FormGroup,
-  Label,
-  Input,
   Col,
   Container,
   Row,
-  Alert,
   Popover,
   PopoverHeader,
   PopoverBody,
   ListGroup,
   ListGroupItem
 } from "reactstrap";
-import axios from "axios";
-import rangeInclusive from "range-inclusive";
 import { ReactComponent as TableSVG } from "./table.svg";
 import * as d3 from "d3";
+import AddMatchComponent from "./AddMatchComponent";
+import GetOddsAndBalanceComponent from "./GetOddsAndBalanceComponent";
 import {
   getPlayers,
   postMatch,
@@ -53,7 +47,6 @@ class AddMatchForm extends Component {
     };
 
     this.reset = this.reset.bind(this);
-    this.getSelectRows = this.getSelectRows.bind(this);
     this.balanceTeams = this.balanceTeams.bind(this);
     this.getOdds = this.getOdds.bind(this);
   }
@@ -136,7 +129,7 @@ class AddMatchForm extends Component {
     );
   }
 
-  async balanceTeams() {
+  balanceTeams = () => {
     const playerList = [
       ...Object.values(this.state.selectedPlayers.red),
       ...Object.values(this.state.selectedPlayers.blue)
@@ -159,10 +152,9 @@ class AddMatchForm extends Component {
         });
       }
     );
-  }
+  };
 
-  createMatch = e => {
-    e.preventDefault();
+  createMatch = () => {
     postMatch(this.state.selectedPlayers, {
       blue: this.bluePoints.value,
       red: this.redPoints.value
@@ -180,18 +172,6 @@ class AddMatchForm extends Component {
       }
     );
   };
-
-  getSelectRows() {
-    return [""].concat(this.state.players).map((player, i) => {
-      return <option key={i}>{player}</option>;
-    });
-  }
-
-  getPointRange() {
-    return [""].concat(rangeInclusive(0, 20, 1)).map((player, i) => {
-      return <option key={i}>{player}</option>;
-    });
-  }
 
   selectPlayer = (color, position, name) => {
     const playersCopy = { ...this.state.selectedPlayers };
@@ -229,159 +209,47 @@ class AddMatchForm extends Component {
 
   render() {
     return (
-      <Container>
+      <Container className="text-center">
+        {!!this.state.selectedTableHandle && (
+          <div>
+            <Popover
+              placement="bottom"
+              isOpen
+              target={this.state.selectedTableHandle}
+            >
+              <PopoverHeader>
+                <div className="text-center">Players</div>
+              </PopoverHeader>
+              <PopoverBody style={{ paddingLeft: 0, paddingRight: 0 }}>
+                <div
+                  style={{
+                    maxHeight: 200,
+                    maxWidth: 200,
+                    overflowY: "auto",
+                    padding: "-5px"
+                  }}
+                >
+                  {this.playerRows(
+                    ...this.state.selectedTableHandleName.split("-")
+                  )}
+                </div>
+              </PopoverBody>
+            </Popover>
+          </div>
+        )}
         <Row>
-          {!!this.state.selectedTableHandle && (
-            <div>
-              <Popover
-                placement="bottom"
-                isOpen
-                target={this.state.selectedTableHandle}
-              >
-                <PopoverHeader>
-                  <div className="text-center">Players</div>
-                </PopoverHeader>
-                <PopoverBody style={{ paddingLeft: 0, paddingRight: 0 }}>
-                  <div
-                    style={{
-                      maxHeight: 200,
-                      maxWidth: 200,
-                      overflowY: "auto",
-                      padding: "-5px"
-                    }}
-                  >
-                    {this.playerRows(
-                      ...this.state.selectedTableHandleName.split("-")
-                    )}
-                  </div>
-                </PopoverBody>
-              </Popover>
-            </div>
-          )}
-          <Form
-            innerRef={form => (this.createMatchForm = form)}
-            onSubmit={e => this.createMatch(e)}
-          >
-            <FormGroup>
-              <Row>
-                <Col>
-                  <Row>
-                    <Col>
-                      <h2>Points</h2>
-                      <Row>
-                        <Col>
-                          <Input
-                            type="select"
-                            name="redPoints"
-                            innerRef={input => (this.redPoints = input)}
-                            placeholder="with a placeholder"
-                          >
-                            {this.getPointRange()}
-                          </Input>
-                        </Col>
-                        <h2>-</h2>
-                        <Col>
-                          <Input
-                            type="select"
-                            name="bluePoints"
-                            innerRef={input => (this.bluePoints = input)}
-                            placeholder="with a placeholder"
-                          >
-                            {this.getPointRange()}
-                          </Input>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <TableSVG />
-                  </Row>
-                  <div>
-                    {this.state.predicted_win_prob_for_blue ? (
-                      <Container>
-                        <Row>
-                          <Col />
-                          <Col>
-                            <h2>Odds</h2>
-                          </Col>
-                          <Col />
-                        </Row>
-                        <Row>
-                          <Col />
-                          <Col>
-                            <h3>
-                              {100 -
-                                Math.round(
-                                  this.state.predicted_win_prob_for_blue * 100
-                                )}{" "}
-                              -{" "}
-                              {Math.round(
-                                this.state.predicted_win_prob_for_blue * 100
-                              )}
-                            </h3>
-                          </Col>
-                          <Col />
-                        </Row>
-                      </Container>
-                    ) : null}
-                  </div>
-                </Col>
+          <Col>
+            <Row>
+              <Col>
                 <Row>
-                  <Col style={{ marginLeft: "20px" }}>
-                    <Row>
-                      <Button onClick={this.balanceTeams}>
-                        Balance Teams →{" "}
-                      </Button>
-                    </Row>
-                    <Row style={{ marginTop: "20px" }}>
-                      <Button type="submit">Add Match → </Button>
-                    </Row>
-                  </Col>
+                  <AddMatchComponent />
                 </Row>
-              </Row>
-            </FormGroup>
-          </Form>
+              </Col>
+              <TableSVG style={{ height: "50vh" }} />
+            </Row>
+          </Col>
         </Row>
-        <div onClick={this.reset}>
-          {this.state.matchSuccess ? (
-            <Row>
-              <Alert color="success">Match Added</Alert>
-            </Row>
-          ) : null}
-        </div>
-        <div onClick={this.reset}>
-          {this.state.matchFail ? (
-            <Row>
-              <Alert color="danger">Something went wrong</Alert>
-            </Row>
-          ) : null}
-        </div>
-        <div onClick={this.reset}>
-          {this.state.analyzePlayersSuccess ? (
-            <Row>
-              <Alert color="success">Teams Balanced</Alert>
-            </Row>
-          ) : null}
-        </div>
-        <div onClick={this.reset}>
-          {this.state.analyzePlayersFail ? (
-            <Row>
-              <Alert color="danger">Something went wrong</Alert>
-            </Row>
-          ) : null}
-        </div>
-        <div onClick={this.reset}>
-          {this.state.analyzeTeamsSuccess ? (
-            <Row>
-              <Alert color="success">Odds Computed</Alert>
-            </Row>
-          ) : null}
-        </div>
-        <div onClick={this.reset}>
-          {this.state.analyzeTeamsFail ? (
-            <Row>
-              <Alert color="danger">Something went wrong</Alert>
-            </Row>
-          ) : null}
-        </div>
+        <GetOddsAndBalanceComponent />
       </Container>
     );
   }
