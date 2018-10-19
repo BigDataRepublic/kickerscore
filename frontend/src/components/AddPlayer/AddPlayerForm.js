@@ -1,5 +1,14 @@
 import React, { Component } from "react";
-import { Button, Form, FormGroup, Label, Input, Alert, Row, Container } from "reactstrap";
+import {
+  Button,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  Alert,
+  Row,
+  Container
+} from "reactstrap";
 import axios from "axios";
 
 class AddPlayerForm extends Component {
@@ -27,16 +36,19 @@ class AddPlayerForm extends Component {
     const player = {
       username: this.name.value
     };
-    const playerPost = await axios
-      .post(process.env.REACT_APP_API_URL + "/kickerscore/api/v1/player", player)
-      .then(function () {
+    await axios
+      .post(
+        process.env.REACT_APP_API_URL + "/kickerscore/api/v1/player",
+        player
+      )
+      .then(function() {
         self.setState({
-            success: true
+          success: true
         });
       })
-      .catch(function () {
+      .catch(function() {
         self.setState({
-            fail: true
+          fail: true
         });
       });
     this.createPlayerForm.reset();
@@ -63,10 +75,18 @@ class AddPlayerForm extends Component {
           </Form>
         </Row>
         <div onClick={this.reset}>
-          {this.state.success ? <Row><Alert color="success">Player Added</Alert></Row> : null}
+          {this.state.success ? (
+            <Row>
+              <Alert color="success">Player Added</Alert>
+            </Row>
+          ) : null}
         </div>
         <div onClick={this.reset}>
-          {this.state.fail ? <Row><Alert color="danger">Something went wrong</Alert></Row> : null}
+          {this.state.fail ? (
+            <Row>
+              <Alert color="danger">Something went wrong</Alert>
+            </Row>
+          ) : null}
         </div>
       </Container>
     );
