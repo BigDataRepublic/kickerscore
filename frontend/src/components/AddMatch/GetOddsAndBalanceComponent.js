@@ -4,7 +4,14 @@ import PropTypes from "prop-types";
 
 export default class GetOddsAndBalanceComponent extends Component {
     render() {
-        const { blue, red, loadingOdds } = this.props;
+        const {
+            blue,
+            red,
+            loadingOdds,
+            onGetBalance,
+            loadingBalance,
+            loadingBalanceError
+        } = this.props;
         const loadingRow = loadingOdds ? (
             <Row key="loadingodds">
                 <h2>Loading odds</h2>
@@ -12,15 +19,17 @@ export default class GetOddsAndBalanceComponent extends Component {
         ) : null;
         const oddsRow = !loadingOdds ? (
             <Row key="odds">
+                <Col />
                 <Col>
                     <h2>{blue.toPrecision(2)}</h2>
-                </Col>,
+                </Col>
                 <Col>
                     <h2>-</h2>
-                </Col>,
+                </Col>
                 <Col>
                     <h2>{red.toPrecision(2)}</h2>
                 </Col>
+                <Col />
             </Row>
         ) : null;
         return [
@@ -28,7 +37,13 @@ export default class GetOddsAndBalanceComponent extends Component {
             oddsRow,
             <Row key="balance">
                 <Col>
-                    <Button type="submit">Balance Teams → </Button>
+                    <Button
+                        onClick={onGetBalance}
+                        disabled={loadingBalance}
+                        color={loadingBalanceError ? "danger" : "secondary"}
+                    >
+                        {loadingBalance ? "..." : "Balance Teams → "}
+                    </Button>
                 </Col>
             </Row>
         ];
@@ -40,7 +55,7 @@ GetOddsAndBalanceComponent.propTypes = {
     red: PropTypes.number,
     onGetBalance: PropTypes.func,
     loadingOdds: PropTypes.bool,
-    loadingBalance: PropTypes.bool,
     loadingOddsError: PropTypes.string,
-    loadingBalanceError: PropTypes.string
+    loadingBalanceError: PropTypes.string,
+    loadingBalance: PropTypes.bool
 };

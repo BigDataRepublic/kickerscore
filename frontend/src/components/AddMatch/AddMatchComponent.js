@@ -6,10 +6,56 @@ const range = (start, end) =>
     Array.from(Array(end).keys()).map(val => val + start);
 
 export default class AddMatchComponent extends Component {
+    state = {
+        matchJustAdded: false
+    };
+
+    addMatch = () =>
+        this.props
+            .onAddMatch(
+                parseInt(this.bluePoints.value),
+                parseInt(this.redPoints.value)
+            )
+            .then(() => this.setState({ matchJustAdded: true }));
+
     renderInputOption = val => <option key={val}>{val}</option>;
 
+    renderButton = (onClick, text, disabled, color = "secondary") => (
+        <Button
+            color={color}
+            style={{ width: "30%", borderRadius: 0 }}
+            disabled={disabled}
+            onClick={onClick}
+        >
+            {text}
+        </Button>
+    );
+
+    renderReMatchButton = () => {
+        const resetComponent = () => {
+            this.setState({ matchJustAdded: false });
+            this.bluePoints.value = "0";
+            this.redPoints.value = "0";
+        };
+        return this.renderButton(
+            resetComponent,
+            "Add another",
+            false,
+            "success"
+        );
+    };
+
+    renderAddMatchButton = () => {
+        const buttonContent = this.props.addingMatch ? "..." : "Add match";
+        return this.renderButton(
+            this.addMatch,
+            buttonContent,
+            !this.props.canAddMatch
+        );
+    };
+
     render() {
-        const { canAddMatch, onAddMatch, addingMatch } = this.props;
+        const { matchJustAdded } = this.state;
         return (
             <InputGroup
                 className="mx-auto"
@@ -24,23 +70,19 @@ export default class AddMatchComponent extends Component {
                     name="redPoints"
                     innerRef={input => (this.redPoints = input)}
                     placeholder="with a placeholder"
+                    style={{ borderRadius: 0, WebkitAppearance: "none" }}
                 >
                     {range(0, 16).map(this.renderInputOption)}
                 </Input>
-                <Button
-                    style={{ width: "30%" }}
-                    disabled={!canAddMatch}
-                    onClick={() =>
-                        onAddMatch(this.bluePoints.value, this.redPoints.value)
-                    }
-                >
-                    Add match
-                </Button>
+                {matchJustAdded
+                    ? this.renderReMatchButton()
+                    : this.renderAddMatchButton()}
                 <Input
                     type="select"
                     name="bluePoints"
                     innerRef={input => (this.bluePoints = input)}
                     placeholder="with a placeholder"
+                    style={{ borderRadius: 0, WebkitAppearance: "none" }}
                 >
                     {range(0, 16).map(this.renderInputOption)}
                 </Input>
@@ -50,7 +92,9 @@ export default class AddMatchComponent extends Component {
 }
 
 AddMatchComponent.propTypes = {
-    onAddMatch: PropTypes.func,
-    canAddMatch: PropTypes.bool,
-    addingMatch: PropTypes.bool
+    onAddMatch: PropTypes.func.isRequired,
+    canAddMatch: PropTypes.bool.isRequired,
+    addingMatch: PropTypes.bool.isRequired
+    // TODO: make it more like this instead of mixing many booleans
+    // matchStatus: PropTypes.oneOf([null, "ADDING", "ADDED"])
 };

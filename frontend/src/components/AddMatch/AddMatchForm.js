@@ -25,11 +25,8 @@ class AddMatchForm extends Component {
     super();
     this.state = {
       addingMatch: false,
-      analyzePlayersSuccess: false,
-      analyzePlayersFail: false,
-      analyzeTeamsSuccess: false,
-      analyzeTeamsFail: false,
-      players: [],
+      loadingOdds: false,
+      loadingOddsError: null,
       predicted_win_prob_for_blue: null,
       previousSelectedTableHandle: null,
       selectedTableHandle: null,
@@ -42,7 +39,8 @@ class AddMatchForm extends Component {
           offense: null,
           defense: null
         }
-      }
+      },
+      popoverOpen: false
     };
 
     this.balanceTeams = this.balanceTeams.bind(this);
@@ -69,18 +67,12 @@ class AddMatchForm extends Component {
         .on("end", () => flashHandle(handleName));
     };
 
-    const removeHandleAnimation = handleName => {
-      d3.select(`g#${handleName}`)
-        .attr("opacity", 1)
-        .interrupt();
-    };
-
     ["red-defense", "red-offense", "blue-defense", "blue-offense"].forEach(
       circleName => {
-        const circle = d3.select(`ellipse#${circleName}`);
-        circle.on("click", () => {
+        const onClickHandler = () => {
           flashHandle(circleName);
           this.setState({
+            popoverOpen: true,
             previousSelectedTableHandleName: this.state.selectedTableHandleName,
             selectedTableHandleName: null,
             selectedTableHandle: null
@@ -93,11 +85,23 @@ class AddMatchForm extends Component {
             });
           }
 
-          removeHandleAnimation(this.state.previousSelectedTableHandleName);
-        });
+          this.removeHandleAnimation(
+            this.state.previousSelectedTableHandleName
+          );
+        };
+        const circle = d3.select(`ellipse#${circleName}`);
+        const circleText = d3.select(`text#${circleName}`);
+        circle.on("click", onClickHandler);
+        circleText.on("click", onClickHandler);
       }
     );
   }
+
+  removeHandleAnimation = handleName => {
+    d3.select(`g#${handleName}`)
+      .attr("opacity", 1)
+      .interrupt();
+  };
 
   balanceTeams = () => {
     const playerList = [
@@ -110,6 +114,7 @@ class AddMatchForm extends Component {
           analyzePlayersSuccess: true,
           predicted_win_prob_for_blue: response.predicted_win_prob_for_blue
         });
+        this.updatePlayerDisplay(response.optimal_team_composition);
       },
       () => {
         this.setState({
@@ -119,9 +124,28 @@ class AddMatchForm extends Component {
     );
   };
 
+  updatePlayerDisplay = playerSetup => {
+    d3.select("text#red-defense").text(
+      playerSetup.red.defense[0].toUpperCase()
+    );
+    d3.select("text#red-defense-sm").text(playerSetup.red.defense);
+    d3.select("text#red-offense").text(
+      playerSetup.red.offense[0].toUpperCase()
+    );
+    d3.select("text#red-offense-sm").text(playerSetup.red.offense);
+    d3.select("text#blue-defense").text(
+      playerSetup.blue.defense[0].toUpperCase()
+    );
+    d3.select("text#blue-defense-sm").text(playerSetup.blue.defense);
+    d3.select("text#blue-offense").text(
+      playerSetup.blue.offense[0].toUpperCase()
+    );
+    d3.select("text#blue-offense-sm").text(playerSetup.blue.offense);
+  };
+
   createMatch = (bluePoints, redPoints) => {
     this.setState({ addingMatch: true });
-    postMatch(this.state.selectedPlayers, {
+    return postMatch(this.state.selectedPlayers, {
       blue: bluePoints,
       red: redPoints
     }).then(
@@ -153,6 +177,8 @@ class AddMatchForm extends Component {
     d3.select(`text#${this.state.selectedTableHandleName}`).text(
       name[0].toUpperCase()
     );
+    d3.select(`text#${this.state.selectedTableHandleName}-sm`).text(name);
+    this.closePopOver();
     if (this.playersComplete(playersCopy)) {
       this.setState({ selectedPlayers: playersCopy, loadingOdds: true }, () => {
         // TODO: move to componentDidUpdate instead
@@ -176,33 +202,54 @@ class AddMatchForm extends Component {
     }
   };
 
-  playerRows = (color, position) => (
-    <ListGroup flush>
-      {this.state.players.map(name => (
-        <ListGroupItem
-          key={name}
-          tag="button"
-          action
-          onClick={() => this.selectPlayer(color, position, name)}
-        >
-          <div
-            style={{
-              float: "left",
-              height: 20,
-              width: 20,
-              backgroundColor: "rgb(235,235,235)",
-              textAlign: "center",
-              borderRadius: 50,
-              marginRight: ".5em"
-            }}
-          >
-            {name[0].toUpperCase()}
-          </div>
-          {name}
-        </ListGroupItem>
-      ))}
-    </ListGroup>
-  );
+  selectedPlayersAsList = () => {
+    const p = this.state.selectedPlayers;
+    return [
+      p.blue.offense,
+      p.blue.defense,
+      p.red.offense,
+      p.red.defense
+    ].filter(n => n);
+  };
+
+  playerRows = (color, position) => {
+    const selectedList = this.selectedPlayersAsList();
+    return (
+      <ListGroup flush>
+        {this.state.players
+          .filter(name => !selectedList.includes(name))
+          .map(name => (
+            <ListGroupItem
+              key={name}
+              tag="button"
+              action
+              onClick={() => this.selectPlayer(color, position, name)}
+            >
+              <div
+                style={{
+                  fontSize: "2em",
+                  float: "left",
+                  height: 50,
+                  width: 50,
+                  backgroundColor: "rgb(235,235,235)",
+                  textAlign: "center",
+                  borderRadius: 50,
+                  marginRight: ".2em"
+                }}
+              >
+                {name[0].toUpperCase()}
+              </div>
+              <div style={{ fontSize: "2em" }}>{name}</div>
+            </ListGroupItem>
+          ))}
+      </ListGroup>
+    );
+  };
+
+  closePopOver = () => {
+    this.setState({ popoverOpen: false });
+    this.removeHandleAnimation(this.state.selectedTableHandleName);
+  };
 
   render() {
     const {
@@ -214,31 +261,30 @@ class AddMatchForm extends Component {
     return (
       <Container className="text-center">
         {!!this.state.selectedTableHandle && (
-          <div>
-            <Popover
-              placement="bottom"
-              isOpen
-              target={this.state.selectedTableHandle}
-            >
-              <PopoverHeader>
-                <div className="text-center">Players</div>
-              </PopoverHeader>
-              <PopoverBody style={{ paddingLeft: 0, paddingRight: 0 }}>
-                <div
-                  style={{
-                    maxHeight: 200,
-                    maxWidth: 200,
-                    overflowY: "auto",
-                    padding: "-5px"
-                  }}
-                >
-                  {this.playerRows(
-                    ...this.state.selectedTableHandleName.split("-")
-                  )}
-                </div>
-              </PopoverBody>
-            </Popover>
-          </div>
+          <Popover
+            placement="bottom"
+            isOpen={this.state.popoverOpen}
+            target={this.state.selectedTableHandle}
+            style={{ width: "15em" }}
+            toggle={this.closePopOver}
+          >
+            <PopoverHeader>
+              <div className="text-center">Players</div>
+            </PopoverHeader>
+            <PopoverBody style={{ paddingLeft: 0, paddingRight: 0 }}>
+              <div
+                style={{
+                  maxHeight: "30em",
+                  overflowY: "auto",
+                  padding: "-5px"
+                }}
+              >
+                {this.playerRows(
+                  ...this.state.selectedTableHandleName.split("-")
+                )}
+              </div>
+            </PopoverBody>
+          </Popover>
         )}
         <Row>
           <Col>
@@ -254,12 +300,17 @@ class AddMatchForm extends Component {
         </Row>
 
         {(loadingOdds || loadingOddsError || predicted_win_prob_for_blue) && (
-          <GetOddsAndBalanceComponent
-            blue={predicted_win_prob_for_blue}
-            red={1 - predicted_win_prob_for_blue}
-            loadingOdds={loadingOdds}
-            loadingOddsError={loadingOddsError}
-          />
+          <Row style={{ margin: "2em" }}>
+            <Col>
+              <GetOddsAndBalanceComponent
+                blue={predicted_win_prob_for_blue}
+                red={1 - predicted_win_prob_for_blue}
+                loadingOdds={loadingOdds}
+                loadingOddsError={loadingOddsError}
+                onGetBalance={this.balanceTeams}
+              />
+            </Col>
+          </Row>
         )}
       </Container>
     );

@@ -15,7 +15,9 @@ const checkResponseStatus = response => {
 };
 
 export const getPlayers = async () =>
-    fetch(`${V1_URL}/players`).then(parseJSON);
+    fetch(`${V1_URL}/players`)
+        .then(checkResponseStatus)
+        .then(parseJSON);
 
 export const postMatch = (playersData, points) =>
     fetch(`${V1_URL}/match`, {
@@ -24,7 +26,9 @@ export const postMatch = (playersData, points) =>
         headers: {
             "Content-Type": "application/json"
         }
-    }).then(parseJSON);
+    })
+        .then(checkResponseStatus)
+        .then(parseJSON);
 
 export const postPlayerAnalysis = async playerList =>
     fetch(`${V1_URL}/analyze-players`, {
@@ -33,7 +37,9 @@ export const postPlayerAnalysis = async playerList =>
         headers: {
             "Content-Type": "application/json"
         }
-    }).then(parseJSON);
+    })
+        .then(checkResponseStatus)
+        .then(parseJSON);
 
 export const postTeamAnalysis = async teamComposition =>
     fetch(`${V1_URL}/analyze-teams`, {
@@ -42,4 +48,6 @@ export const postTeamAnalysis = async teamComposition =>
         headers: {
             "Content-Type": "application/json"
         }
-    }).then(parseJSON);
+    })
+        .then(checkResponseStatus)
+        .then(parseJSON);
