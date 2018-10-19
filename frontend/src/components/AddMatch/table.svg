@@ -30,9 +30,21 @@
             <path d="M 606.382 800 L 1264.118 800 C 1268.744 800 1272.5 803.756 1272.5 808.382 L 1272.5 809.618 C 1272.5 814.244 1268.744 818 1264.118 818 L 606.382 818 C 601.756 818 598 814.244 598 809.618 L 598 808.382 C 598 803.756 601.756 800 606.382 800 Z" style="stroke:none;fill:#84858C;stroke-linecap:square;stroke-miterlimit:2;" />
             <path d="M 1220.16 788 L 1262.84 788 C 1268.171 788 1272.5 792.329 1272.5 797.66 L 1272.5 820.34 C 1272.5 825.671 1268.171 830 1262.84 830 L 1220.16 830 C 1214.829 830 1210.5 825.671 1210.5 820.34 L 1210.5 797.66 C 1210.5 792.329 1214.829 788 1220.16 788 Z" style="stroke:none;fill:#3E33CC;stroke-linecap:square;stroke-miterlimit:2;" />
         </g>
-        <ellipse id="red-defense" vector-effect="non-scaling-stroke" cx="405" cy="316.00000000000006" rx="75" ry="73.75" fill="rgb(235,235,235)" />
-        <ellipse id="red-offense" vector-effect="non-scaling-stroke" cx="405" cy="678.0000000000001" rx="75" ry="73.75" fill="rgb(235,235,235)" />
-        <ellipse id="blue-offense" vector-effect="non-scaling-stroke" cx="1403" cy="440.0000000000002" rx="75" ry="73.75" fill="rgb(235,235,235)" />
-        <ellipse id="blue-defense" vector-effect="non-scaling-stroke" cx="1403" cy="809.0000000000001" rx="75" ry="73.75" fill="rgb(235,235,235)" />
+        <g>
+            <ellipse id="red-defense" vector-effect="non-scaling-stroke" cx="405" cy="316" rx="75" ry="73.75" fill="rgb(235,235,235)" />
+            <text id="red-defense" text-anchor="middle" dx="405" dy="339" style="font-weight:400;font-size:84px;font-style:normal;fill:#000000;stroke:none;">?</text>
+        </g>
+        <g>
+            <ellipse id="red-offense" vector-effect="non-scaling-stroke" cx="405" cy="678" rx="75" ry="73.75" fill="rgb(235,235,235)" />
+            <text id="red-offense" text-anchor="middle" dx="405" dy="703" style="font-weight:400;font-size:84px;font-style:normal;fill:#000000;stroke:none;">?</text>
+        </g>
+        <g>
+            <ellipse id="blue-offense" vector-effect="non-scaling-stroke" cx="1403" cy="440" rx="75" ry="73.75" fill="rgb(235,235,235)" />
+            <text id="blue-offense" text-anchor="middle" dx="1403" dy="465" style="font-weight:400;font-size:84px;font-style:normal;fill:#000000;stroke:none;">?</text>
+        </g>
+        <g>
+            <ellipse id="blue-defense" vector-effect="non-scaling-stroke" cx="1403" cy="809" rx="75" ry="73.75" fill="rgb(235,235,235)" />
+            <text id="blue-defense" text-anchor="middle" dx="1403" dy="834" style="font-weight:400;font-size:84px;font-style:normal;fill:#000000;stroke:none;">?</text>
+        </g>
     </g>
 </svg>

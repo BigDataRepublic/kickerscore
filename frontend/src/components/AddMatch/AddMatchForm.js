@@ -24,8 +24,7 @@ class AddMatchForm extends Component {
   constructor() {
     super();
     this.state = {
-      matchSuccess: false,
-      matchFail: false,
+      addingMatch: false,
       analyzePlayersSuccess: false,
       analyzePlayersFail: false,
       analyzeTeamsSuccess: false,
@@ -46,9 +45,7 @@ class AddMatchForm extends Component {
       }
     };
 
-    this.reset = this.reset.bind(this);
     this.balanceTeams = this.balanceTeams.bind(this);
-    this.getOdds = this.getOdds.bind(this);
   }
 
   async componentDidMount() {
@@ -102,33 +99,6 @@ class AddMatchForm extends Component {
     );
   }
 
-  reset() {
-    this.setState({
-      matchSuccess: false,
-      matchFail: false,
-      analyzePlayersSuccess: false,
-      analyzePlayersFail: false,
-      analyzeTeamsSuccess: false,
-      analyzeTeamsFail: false
-    });
-  }
-
-  getOdds() {
-    postTeamAnalysis(this.state.selectedPlayers).then(
-      response => {
-        this.setState({
-          analyzeTeamsSuccess: true,
-          predicted_win_prob_for_blue: response.predicted_win_prob_for_blue
-        });
-      },
-      () => {
-        this.setState({
-          analyzeTeamsFail: true
-        });
-      }
-    );
-  }
-
   balanceTeams = () => {
     const playerList = [
       ...Object.values(this.state.selectedPlayers.red),
@@ -140,11 +110,6 @@ class AddMatchForm extends Component {
           analyzePlayersSuccess: true,
           predicted_win_prob_for_blue: response.predicted_win_prob_for_blue
         });
-        // TODO: update team composition with proposed values
-        // this.blueOffense.value = response.optimal_team_composition.blue.offense;
-        // this.redOffense.value = response.optimal_team_composition.red.offense;
-        // this.blueDefense.value = response.optimal_team_composition.blue.defense;
-        // this.redDefense.value = response.optimal_team_composition.red.defense;
       },
       () => {
         this.setState({
@@ -154,29 +119,61 @@ class AddMatchForm extends Component {
     );
   };
 
-  createMatch = () => {
+  createMatch = (bluePoints, redPoints) => {
+    this.setState({ addingMatch: true });
     postMatch(this.state.selectedPlayers, {
-      blue: this.bluePoints.value,
-      red: this.redPoints.value
+      blue: bluePoints,
+      red: redPoints
     }).then(
       () => {
         this.setState({
-          matchSuccess: true,
-          analysis: null
+          analysis: null,
+          addingMatch: false
         });
       },
       () => {
         this.setState({
-          matchFail: true
+          addingMatch: false
         });
       }
     );
   };
 
+  playersComplete = playersObj => {
+    const flatPlayers = new Set([
+      ...Object.values(playersObj.red).filter(val => val),
+      ...Object.values(playersObj.blue).filter(val => val)
+    ]);
+    return flatPlayers.size === 4;
+  };
+
   selectPlayer = (color, position, name) => {
     const playersCopy = { ...this.state.selectedPlayers };
     playersCopy[color][position] = name;
-    this.setState({ selectedPlayers: playersCopy });
+    d3.select(`text#${this.state.selectedTableHandleName}`).text(
+      name[0].toUpperCase()
+    );
+    if (this.playersComplete(playersCopy)) {
+      this.setState({ selectedPlayers: playersCopy, loadingOdds: true }, () => {
+        // TODO: move to componentDidUpdate instead
+        postTeamAnalysis(playersCopy).then(
+          response => {
+            this.setState({
+              loadingOdds: false,
+              predicted_win_prob_for_blue: response.predicted_win_prob_for_blue
+            });
+          },
+          () => {
+            this.setState({
+              loadingOdds: false,
+              loadingOddsError: "Something went wrong"
+            });
+          }
+        );
+      });
+    } else {
+      this.setState({ selectedPlayers: playersCopy });
+    }
   };
 
   playerRows = (color, position) => (
@@ -208,6 +205,12 @@ class AddMatchForm extends Component {
   );
 
   render() {
+    const {
+      loadingOdds,
+      loadingOddsError,
+      predicted_win_prob_for_blue,
+      addingMatch
+    } = this.state;
     return (
       <Container className="text-center">
         {!!this.state.selectedTableHandle && (
@@ -239,17 +242,25 @@ class AddMatchForm extends Component {
         )}
         <Row>
           <Col>
-            <Row>
-              <Col>
-                <Row>
-                  <AddMatchComponent />
-                </Row>
-              </Col>
-              <TableSVG style={{ height: "50vh" }} />
-            </Row>
+            <AddMatchComponent
+              onAddMatch={this.createMatch}
+              canAddMatch={this.playersComplete(this.state.selectedPlayers)}
+              addingMatch={addingMatch}
+            />
           </Col>
         </Row>
-        <GetOddsAndBalanceComponent />
+        <Row>
+          <TableSVG style={{ height: "60vh" }} />
+        </Row>
+
+        {(loadingOdds || loadingOddsError || predicted_win_prob_for_blue) && (
+          <GetOddsAndBalanceComponent
+            blue={predicted_win_prob_for_blue}
+            red={1 - predicted_win_prob_for_blue}
+            loadingOdds={loadingOdds}
+            loadingOddsError={loadingOddsError}
+          />
+        )}
       </Container>
     );
   }
