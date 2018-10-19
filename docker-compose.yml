@@ -15,7 +15,7 @@ services:
     - POSTGRES_HOST=db
 
   db:
-    image: postgres
+    image: postgres:10.5-alpine
     environment:
     - POSTGRES_USER=foo
     - POSTGRES_PASSWORD=bar
@@ -31,8 +31,8 @@ services:
     - POSTGRES_USER=foo
     - POSTGRES_PASSWORD=bar
     - POSTGRES_HOST=db
-    - FLASK_APP=opt/app/app
-    command: "flask db upgrade -d opt/app/migrations"
+    - FLASK_APP=/app/app
+    command: "flask db upgrade -d /app/migrations"
     restart: on-failure
 
   frontend:
