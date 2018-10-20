@@ -33,22 +33,22 @@
         <g>
             <ellipse id="red-defense" vector-effect="non-scaling-stroke" cx="405" cy="316" rx="75" ry="73.75" fill="rgb(235,235,235)" />
             <text id="red-defense" text-anchor="middle" dx="405" dy="339" style="font-weight:400;font-size:84px;font-style:normal;fill:#000000;stroke:none;">?</text>
-            <text id="red-defense-sm" text-anchor="middle" dx="405" dy="443" style="font-weight:400;font-size:54px;font-style:normal;fill:#000000;stroke:none;">?</text>
+            <text id="red-defense-sm" text-anchor="middle" dx="405" dy="443" style="font-weight:400;font-size:54px;font-style:normal;fill:#000000;stroke:none;"></text>
         </g>
         <g>
             <ellipse id="red-offense" vector-effect="non-scaling-stroke" cx="405" cy="678" rx="75" ry="73.75" fill="rgb(235,235,235)" />
             <text id="red-offense" text-anchor="middle" dx="405" dy="703" style="font-weight:400;font-size:84px;font-style:normal;fill:#000000;stroke:none;">?</text>
-            <text id="red-offense-sm" text-anchor="middle" dx="405" dy="807" style="font-weight:400;font-size:54px;font-style:normal;fill:#000000;stroke:none;">?</text>
+            <text id="red-offense-sm" text-anchor="middle" dx="405" dy="807" style="font-weight:400;font-size:54px;font-style:normal;fill:#000000;stroke:none;"></text>
         </g>
         <g>
             <ellipse id="blue-offense" vector-effect="non-scaling-stroke" cx="1403" cy="440" rx="75" ry="73.75" fill="rgb(235,235,235)" />
             <text id="blue-offense" text-anchor="middle" dx="1403" dy="465" style="font-weight:400;font-size:84px;font-style:normal;fill:#000000;stroke:none;">?</text>
-            <text id="blue-offense-sm" text-anchor="middle" dx="1403" dy="560" style="font-weight:400;font-size:54px;font-style:normal;fill:#000000;stroke:none;">?</text>
+            <text id="blue-offense-sm" text-anchor="middle" dx="1403" dy="560" style="font-weight:400;font-size:54px;font-style:normal;fill:#000000;stroke:none;"></text>
         </g>
         <g>
             <ellipse id="blue-defense" vector-effect="non-scaling-stroke" cx="1403" cy="809" rx="75" ry="73.75" fill="rgb(235,235,235)" />
             <text id="blue-defense" text-anchor="middle" dx="1403" dy="834" style="font-weight:400;font-size:84px;font-style:normal;fill:#000000;stroke:none;">?</text>
-            <text id="blue-defense-sm" text-anchor="middle" dx="1403" dy="929" style="font-weight:400;font-size:54px;font-style:normal;fill:#000000;stroke:none;">?</text>
+            <text id="blue-defense-sm" text-anchor="middle" dx="1403" dy="929" style="font-weight:400;font-size:54px;font-style:normal;fill:#000000;stroke:none;"></text>
         </g>
     </g>
 </svg>
