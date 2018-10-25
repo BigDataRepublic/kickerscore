@@ -3,6 +3,7 @@ import axios from "axios";
 import { Table } from "reactstrap";
 import { Container, Row, Col } from "reactstrap";
 import TopHeader from "../../shared/components.js";
+import { getPlayers } from "../../ApiClient";
 
 class Home extends Component {
   constructor() {
@@ -22,9 +23,10 @@ class Home extends Component {
   }
 
   async getPlayers() {
-    const { data } = await axios.get(
-      process.env.REACT_APP_API_URL + "/kickerscore/api/v1/players"
-    );
+    // const { data } = await axios.get(
+    //   process.env.REACT_APP_API_URL + "/kickerscore/api/v1/players"
+    // );
+    const data = await getPlayers();
     this.setState({ players: data });
   }
 

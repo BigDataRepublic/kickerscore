@@ -50,10 +50,6 @@ class AddMatchForm extends Component {
     const data = await getPlayers();
     this.setState({
       players: data
-        .sort((a, b) => ("" + a.username).localeCompare(b.username))
-        .map(player => {
-          return player.username;
-        })
     });
 
     const flashHandle = handleName => {
@@ -171,12 +167,23 @@ class AddMatchForm extends Component {
     return flatPlayers.size === 4;
   };
 
-  selectPlayer = (color, position, name) => {
+  selectPlayer = (color, position, name, avatarUrl) => {
     const playersCopy = { ...this.state.selectedPlayers };
     playersCopy[color][position] = name;
-    d3.select(`text#${this.state.selectedTableHandleName}`).text(
-      name[0].toUpperCase()
+    // d3.select(`text#${this.state.selectedTableHandleName}`).text(
+    //   name[0].toUpperCase()
+    // );
+    window.d3 = d3;
+
+    d3.select(`image#${this.state.selectedTableHandleName}`)
+      .attr("xlink:href", avatarUrl)
+      .attr("width", 192)
+      .attr("height", 192);
+    d3.select(`ellipse#${this.state.selectedTableHandleName}`).style(
+      "fill",
+      `url(#pattern-${this.state.selectedTableHandleName})`
     );
+    d3.select(`text#${this.state.selectedTableHandleName}`).text("");
     d3.select(`text#${this.state.selectedTableHandleName}-sm`).text(name);
     this.closePopOver();
     if (this.playersComplete(playersCopy)) {
@@ -213,17 +220,25 @@ class AddMatchForm extends Component {
   };
 
   playerRows = (color, position) => {
-    const selectedList = this.selectedPlayersAsList();
+    // const selectedList = this.selectedPlayersAsList();
     return (
       <ListGroup flush>
         {this.state.players
-          .filter(name => !selectedList.includes(name))
-          .map(name => (
+          // .filter(p => !selectedList.includes(p.username))
+          .sort((a, b) => ("" + a.username).localeCompare(b.username))
+          .map(player => (
             <ListGroupItem
-              key={name}
+              key={player.username}
               tag="button"
               action
-              onClick={() => this.selectPlayer(color, position, name)}
+              onClick={() =>
+                this.selectPlayer(
+                  color,
+                  position,
+                  player.username,
+                  player.avatar
+                )
+              }
             >
               <div
                 style={{
@@ -234,12 +249,12 @@ class AddMatchForm extends Component {
                   backgroundColor: "rgb(235,235,235)",
                   textAlign: "center",
                   borderRadius: 50,
-                  marginRight: ".2em"
+                  marginRight: ".2em",
+                  backgroundImage: `url(${player.avatar})`,
+                  backgroundSize: "cover"
                 }}
-              >
-                {name[0].toUpperCase()}
-              </div>
-              <div style={{ fontSize: "2em" }}>{name}</div>
+              />
+              <div style={{ fontSize: "2em" }}>{player.username}</div>
             </ListGroupItem>
           ))}
       </ListGroup>

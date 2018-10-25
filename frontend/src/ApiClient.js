@@ -1,8 +1,6 @@
 const BASE_URL = process.env.REACT_APP_API_URL || "";
 const V1_URL = `${BASE_URL}/kickerscore/api/v1`;
 
-console.log(V1_URL);
-
 const parseJSON = response => response.json();
 
 const checkResponseStatus = response => {
