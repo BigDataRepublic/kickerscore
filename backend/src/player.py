@@ -7,7 +7,7 @@ from db import db
 
 class PlayersResource(Resource):
     def get(self):
-        return list(map(lambda x: x.serialize(), Player.query.all()))
+        return list(map(lambda x: x.serialize(), Player.query.filter_by(active=True)))
 
 
 class PlayerResource(Resource):

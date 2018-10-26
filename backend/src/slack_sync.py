@@ -21,8 +21,9 @@ def sync_new_left_channel_members():
         "conversations.members", channel=kickerscore_channel_id)["members"])
     current_db_players = Player.query.all()
     current_db_players_ids = set([p.slack_id for p in current_db_players])
-    new_players = current_slack_members ^ current_db_players_ids
     to_deactivate_players = current_db_players_ids - current_slack_members
+    new_players = current_slack_members ^ current_db_players_ids - to_deactivate_players
+    import ipdb; ipdb.set_trace()
 
     logger.info(f"Going to add {new_players} new player(s)")
     for np in new_players:
@@ -41,7 +42,8 @@ def sync_new_left_channel_members():
         db.session.add(to_add)
 
     for to_deactivate in to_deactivate_players:
-        to_deactivate_instance = next((p for p in current_db_players if p.id == to_deactivate))
+        to_deactivate_instance = next((p for p in current_db_players
+                                       if p.slack_id == to_deactivate))
         to_deactivate_instance.active = False
 
     db.session.commit()
