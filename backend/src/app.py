@@ -1,3 +1,5 @@
+import atexit
+
 from flask import Flask
 from flask_restful import Resource, Api
 from flask_migrate import Migrate
@@ -23,12 +25,14 @@ migrate = Migrate(app, db)
 
 # Watch it: this stuff will get out of control if you run multiple
 # instances of this app. Need to ensure there's just one scheduler!
-scheduler = BackgroundScheduler()
+scheduler = BackgroundScheduler(timezone="Europe/Amsterdam")
 # Check channel if there are new players
 new_player_sync = scheduler.add_job(sync_new_left_channel_members, "interval", seconds=30)
 # Revisist existing players and update info if required
 existing_player_sync = scheduler.add_job(sync_existing_members_info, "interval", minutes=1)
 scheduler.start()
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())
 
 
 class Healthz(Resource):

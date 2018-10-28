@@ -5,7 +5,8 @@ RUN apk --no-cache add build-base
 RUN apk --no-cache add postgresql-dev
 
 RUN mkdir /app
-RUN pip install --upgrade pip && pip install trueskill flask-restful psycopg2 flask-sqlalchemy flask-migrate flask-cors
+COPY requirements.txt /app
+RUN pip install -r /app/requirements.txt
 COPY src /app
 
 CMD ["python", "/app/app.py"]

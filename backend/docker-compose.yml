@@ -13,6 +13,8 @@ services:
     - POSTGRES_USER=foo
     - POSTGRES_PASSWORD=bar
     - POSTGRES_HOST=db
+    - SLACK_OAUTH_TOKEN=${SLACK_OAUTH_TOKEN}
+    - KICKERSCORE_CHANNEL_ID=${KICKERSCORE_CHANNEL_ID}
 
   db:
     image: postgres:10.5-alpine
@@ -32,5 +34,7 @@ services:
     - POSTGRES_PASSWORD=bar
     - POSTGRES_HOST=db
     - FLASK_APP=/app/app
+    - SLACK_OAUTH_TOKEN=${SLACK_OAUTH_TOKEN}
+    - KICKERSCORE_CHANNEL_ID=${KICKERSCORE_CHANNEL_ID}
     command: "flask db upgrade -d /app/migrations"
     restart: on-failure
