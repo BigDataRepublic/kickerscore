@@ -19,6 +19,8 @@ class AddMatchForm extends Component {
         analyzePlayersFail: false,
         analyzeTeamsSuccess: false,
         analyzeTeamsFail: false,
+        rematchFail: false,
+        rematchSuccess: false,
         players: [],
         predicted_win_prob_for_blue: null,
     };
@@ -27,6 +29,7 @@ class AddMatchForm extends Component {
     this.getSelectRows = this.getSelectRows.bind(this);
     this.balanceTeams = this.balanceTeams.bind(this);
     this.getOdds = this.getOdds.bind(this);
+    this.getRematchConfiguration = this.getRematchConfiguration.bind(this);
   }
 
   async componentWillMount() {
@@ -48,7 +51,9 @@ class AddMatchForm extends Component {
       analyzePlayersSuccess: false,
       analyzePlayersFail: false,
       analyzeTeamsSuccess: false,
-      analyzeTeamsFail: false
+      analyzeTeamsFail: false,
+      rematchFail: false,
+      rematchSuccess: false
     });
   }
 
@@ -144,17 +149,43 @@ class AddMatchForm extends Component {
     await axios
       .post(process.env.REACT_APP_API_URL + "/kickerscore/api/v1/match", match)
       .then(function () {
+        self.setRematchConfiguration(match.players);
+        self.createMatchForm.reset();
         self.setState({
           matchSuccess: true,
           analysis: null
         });
-        self.createMatchForm.reset();
       })
       .catch(function () {
         self.setState({
           matchFail: true
         });
       });
+  }
+
+  getRematchConfiguration() {
+    this.reset();
+    const rematchConfiguration = JSON.parse(sessionStorage.getItem('rematchConfiguration'));
+    if (rematchConfiguration == null) {
+      this.setState({
+        rematchFail: true
+      });
+
+      return
+    }
+
+    this.blueOffense.value = rematchConfiguration.blue.offense;
+    this.redOffense.value = rematchConfiguration.red.offense;
+    this.blueDefense.value = rematchConfiguration.blue.defense;
+    this.redDefense.value = rematchConfiguration.red.defense;
+
+    this.setState({
+      rematchSuccess: true
+    });
+  }
+
+  setRematchConfiguration(rematchConfiguration) {
+    sessionStorage.setItem('rematchConfiguration', JSON.stringify(rematchConfiguration));
   }
 
   getSelectRows() {
@@ -294,6 +325,9 @@ class AddMatchForm extends Component {
                     <Row style={{marginTop: '20px'}}>
                   <Button type="submit">Add Match → </Button>
                     </Row>
+                    <Row style={{marginTop: '20px'}}>
+                  <Button onClick={this.getRematchConfiguration}>Rematch → </Button>
+                    </Row>
                 </Col>
               </Row>
               </Row>
@@ -317,6 +351,12 @@ class AddMatchForm extends Component {
         </div>
         <div onClick={this.reset}>
           {this.state.analyzeTeamsFail ? <Row><Alert color="danger">Something went wrong</Alert></Row> : null}
+        </div>
+        <div onClick={this.reset}>
+          {this.state.rematchSuccess ? <Row><Alert color="success">Rematch Configured</Alert></Row> : null}
+        </div>
+        <div onClick={this.reset}>
+          {this.state.rematchFail ? <Row><Alert color="danger">No Previous Match Found</Alert></Row> : null}
         </div>
       </Container>
     );
