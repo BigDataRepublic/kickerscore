@@ -48,9 +48,6 @@ export default class Navigation extends React.Component {
           <NavItem>
             <NavLink href="/add-match/"><div style={navFontStyle}>Add Match</div></NavLink>
           </NavItem>
-          <NavItem>
-            <NavLink href="/add-player/"><div style={navFontStyle}>Add Player</div></NavLink>
-          </NavItem>
             </Nav>
         </Navbar>
       </div>

@@ -23,7 +23,6 @@ def sync_new_left_channel_members():
     current_db_players_ids = set([p.slack_id for p in current_db_players])
     to_deactivate_players = current_db_players_ids - current_slack_members
     new_players = current_slack_members ^ current_db_players_ids - to_deactivate_players
-    import ipdb; ipdb.set_trace()
 
     logger.info(f"Going to add {new_players} new player(s)")
     for np in new_players:
