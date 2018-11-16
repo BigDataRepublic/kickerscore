@@ -188,7 +188,7 @@ spec:
       initContainers:
         - name: kickerscore-db-migrate
           image: 10.8.0.1:30000/sreitsma/kickerscore:latest
-          command: ["flask", "db", "upgrade", "-d", "/opt/app/migrations"]
+          command: ["flask", "db", "upgrade", "-d", "/app/migrations"]
           env:
             - name: "POSTGRES_HOST"
               value: "kickerscore-db-service.kickerscore.svc.cluster.local"
@@ -213,7 +213,7 @@ spec:
                   name: slack-secret
                   key: channel_id
             - name: "FLASK_APP"
-              value: "/opt/app/app"
+              value: "/app/app"
       containers:
       - name: kickerscore-backend
         image: 10.8.0.1:30000/sreitsma/kickerscore:latest
@@ -249,15 +249,15 @@ spec:
           - name: "FLASK_APP"
             value: "/opt/app/app"
           - name: "SLACK_OAUTH_TOKEN"
-              valueFrom:
-                secretKeyRef:
-                  name: slack-secret
-                  key: oauth_key
-            - name: "KICKERSCORE_CHANNEL_ID"
-              valueFrom:
-                secretKeyRef:
-                  name: slack-secret
-                  key: channel_id
+            valueFrom:
+              secretKeyRef:
+                name: slack-secret
+                key: oauth_key
+          - name: "KICKERSCORE_CHANNEL_ID"
+            valueFrom:
+              secretKeyRef:
+                name: slack-secret
+                key: channel_id
 
 ---
 apiVersion: apps/v1
