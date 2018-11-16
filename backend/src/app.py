@@ -15,7 +15,7 @@ from slack_sync import sync_new_left_channel_members, sync_existing_members_info
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = \
     f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_DATABASE}"
-app.config['SQLALCHEMY_TRAdCK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 api = Api(app)
 cors = CORS(app)
 db.init_app(app)
