@@ -107,6 +107,17 @@ data:
   auth: "[hidden for git]"
 
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: slack-secret
+  namespace: kickerscore
+type: Opaque
+data:
+  channel_id: "[hidden for git]"
+  oauth_key: "[hidden for git]"
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -191,6 +202,16 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: password
+            - name: "SLACK_OAUTH_TOKEN"
+              valueFrom:
+                secretKeyRef:
+                  name: slack-secret
+                  key: oauth_key
+            - name: "KICKERSCORE_CHANNEL_ID"
+              valueFrom:
+                secretKeyRef:
+                  name: slack-secret
+                  key: channel_id
             - name: "FLASK_APP"
               value: "/opt/app/app"
       containers:
@@ -227,6 +248,16 @@ spec:
                 key: password
           - name: "FLASK_APP"
             value: "/opt/app/app"
+          - name: "SLACK_OAUTH_TOKEN"
+              valueFrom:
+                secretKeyRef:
+                  name: slack-secret
+                  key: oauth_key
+            - name: "KICKERSCORE_CHANNEL_ID"
+              valueFrom:
+                secretKeyRef:
+                  name: slack-secret
+                  key: channel_id
 
 ---
 apiVersion: apps/v1

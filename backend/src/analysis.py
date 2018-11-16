@@ -59,10 +59,10 @@ def analyze_players(players):
         return {
             "optimal_team_composition": {
                 "blue": {
-                    "offense": final_composition[0].username
+                    "offense": final_composition[0].slack_username
                 },
                 "red": {
-                    "offense": final_composition[1].username
+                    "offense": final_composition[1].slack_username
                 }
             },
             "match_balance": match_balance,
@@ -73,11 +73,11 @@ def analyze_players(players):
         return {
             "optimal_team_composition": {
                 "blue": {
-                    "offense": final_composition[0].username
+                    "offense": final_composition[0].slack_username
                 },
                 "red": {
-                    "offense": final_composition[1].username,
-                    "defense": final_composition[2].username
+                    "offense": final_composition[1].slack_username,
+                    "defense": final_composition[2].slack_username
                 }
             },
             "match_balance": match_balance,
@@ -88,12 +88,12 @@ def analyze_players(players):
         return {
             "optimal_team_composition": {
                 "blue": {
-                    "offense": final_composition[0].username,
-                    "defense": final_composition[1].username
+                    "offense": final_composition[0].slack_username,
+                    "defense": final_composition[1].slack_username
                 },
                 "red": {
-                    "offense": final_composition[2].username,
-                    "defense": final_composition[3].username
+                    "offense": final_composition[2].slack_username,
+                    "defense": final_composition[3].slack_username
                 }
             },
             "match_balance": match_balance,

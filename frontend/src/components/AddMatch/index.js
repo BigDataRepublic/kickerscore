@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Container, Row, Col } from "reactstrap";
 import AddMatchForm from "../AddMatch/AddMatchForm";
-import TopHeader from "../../shared/components";
 
 class AddMatch extends Component {
   constructor() {
@@ -16,13 +15,8 @@ class AddMatch extends Component {
       <Container>
         <Row>
           <Col>
-            <TopHeader>Add Match</TopHeader>
+            <AddMatchForm />
           </Col>
-        </Row>
-        <Row>
-            <Col>
-          <AddMatchForm />
-            </Col>
         </Row>
       </Container>
     );

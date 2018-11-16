@@ -39,12 +39,10 @@ class MatchResource(Resource):
 
         # Create match and set players and points
         match = Match()
-        match.blue_offense_player = players['blue']['offense'].lower()
-        match.blue_defense_player = players['blue']['defense'].lower()
-        match.red_offense_player = players['red']['offense'].lower()
-        match.red_defense_player = players['red']['defense'].lower()
 
-        list_of_players = [match.blue_offense_player, match.blue_defense_player, match.red_offense_player, match.red_defense_player]
+        list_of_players = [
+            players["blue"]["offense"], players["blue"]["defense"],
+            players["red"]["offense"], players["red"]["defense"]]
         if len(set(list_of_players)) != len(list_of_players):
             # Duplicate players
             return "There are duplicate players in your request", 400
@@ -53,10 +51,15 @@ class MatchResource(Resource):
         match.red_points = int(points['red'])
 
         # Set match balance and predicted win probability
-        player_blue_offense = Player.query.filter_by(username=players['blue']['offense'].lower()).first()
-        player_blue_defense = Player.query.filter_by(username=players['blue']['defense'].lower()).first()
-        player_red_offense = Player.query.filter_by(username=players['red']['offense'].lower()).first()
-        player_red_defense = Player.query.filter_by(username=players['red']['defense'].lower()).first()
+        player_blue_offense = Player.query.filter_by(slack_username=players['blue']['offense']).first()
+        player_blue_defense = Player.query.filter_by(slack_username=players['blue']['defense']).first()
+        player_red_offense = Player.query.filter_by(slack_username=players['red']['offense']).first()
+        player_red_defense = Player.query.filter_by(slack_username=players['red']['defense']).first()
+
+        match.blue_offense_player = player_blue_offense.slack_id
+        match.blue_defense_player = player_blue_defense.slack_id
+        match.red_offense_player = player_red_offense.slack_id
+        match.red_defense_player = player_red_defense.slack_id
 
         stats = analysis.analyze_teams(player_blue_offense, player_blue_defense, player_red_offense, player_red_defense)
 
@@ -136,7 +139,7 @@ class AnalyzePlayers(Resource):
 
         args = parser.parse_args()
 
-        players = list(map(lambda x: Player.query.filter_by(username=x).first(), args['players']))
+        players = list(map(lambda x: Player.query.filter_by(slack_username=x).first(), args['players']))
         stats = analysis.analyze_players(players)
 
         return stats, 200
@@ -151,10 +154,10 @@ class AnalyzeTeams(Resource):
 
         players = json.loads(args['players'].replace("'", "\""))
 
-        player_blue_offense = Player.query.filter_by(username=players['blue']['offense']).first()
-        player_blue_defense = Player.query.filter_by(username=players['blue']['defense']).first()
-        player_red_offense = Player.query.filter_by(username=players['red']['offense']).first()
-        player_red_defense = Player.query.filter_by(username=players['red']['defense']).first()
+        player_blue_offense = Player.query.filter_by(slack_username=players['blue']['offense']).first()
+        player_blue_defense = Player.query.filter_by(slack_username=players['blue']['defense']).first()
+        player_red_offense = Player.query.filter_by(slack_username=players['red']['offense']).first()
+        player_red_defense = Player.query.filter_by(slack_username=players['red']['defense']).first()
 
         stats = analysis.analyze_teams(player_blue_offense, player_blue_defense, player_red_offense, player_red_defense)
 

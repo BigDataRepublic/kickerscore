@@ -3,6 +3,7 @@ import axios from "axios";
 import { Table } from "reactstrap";
 import { Container, Row, Col } from "reactstrap";
 import TopHeader from "../../shared/components.js";
+import { getPlayers } from "../../ApiClient";
 
 class Home extends Component {
   constructor() {
@@ -14,39 +15,33 @@ class Home extends Component {
 
   componentDidMount() {
     this.getPlayers();
-    this.intervalID = setInterval(
-      () => this.getPlayers(),
-      10000
-    );
-
+    this.intervalID = setInterval(() => this.getPlayers(), 10000);
   }
 
   componentWillUnmount() {
     clearInterval(this.intervalID);
   }
 
-
   async getPlayers() {
-    const { data } = await axios.get(
-      process.env.REACT_APP_API_URL + "/kickerscore/api/v1/players"
-    );
+    // const { data } = await axios.get(
+    //   process.env.REACT_APP_API_URL + "/kickerscore/api/v1/players"
+    // );
+    const data = await getPlayers();
     this.setState({ players: data });
   }
 
   getTableRows(position) {
-    {
-      return this.state.players
-        .sort((a, b) => a[`rank_${position}`] - b[`rank_${position}`])
-        .map((player, i) => {
-          return (
-            <tr key={i}>
-              <td>{player[`rank_${position}`] + 1}</td>
-              <td>{player.username}</td>
-              <td>{Math.round(player.current_trueskill[`${position}`])}</td>
-            </tr>
-          );
-        });
-    }
+    return this.state.players
+      .sort((a, b) => a[`rank_${position}`] - b[`rank_${position}`])
+      .map((player, i) => {
+        return (
+          <tr key={i}>
+            <td>{player[`rank_${position}`] + 1}</td>
+            <td>{player.username}</td>
+            <td>{Math.round(player.current_trueskill[`${position}`])}</td>
+          </tr>
+        );
+      });
   }
 
   capitalize(string) {

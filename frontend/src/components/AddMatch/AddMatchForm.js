@@ -1,363 +1,332 @@
 import React, { Component } from "react";
-import { Button, Form, FormGroup, Label, Input, Col, Media, Container, Row, Alert } from "reactstrap";
-import axios from "axios";
-import FoosballTablePicture from "./foosball_table.png";
-import rangeInclusive from "range-inclusive";
-
-let imgStyle = {
-  maxHeight: '325px',
-  maxWidth: '325px'
-};
+import {
+  Col,
+  Container,
+  Row,
+  Popover,
+  PopoverHeader,
+  PopoverBody,
+  ListGroup,
+  ListGroupItem
+} from "reactstrap";
+import { ReactComponent as TableSVG } from "./table.svg";
+import * as d3 from "d3";
+import AddMatchComponent from "./AddMatchComponent";
+import GetOddsAndBalanceComponent from "./GetOddsAndBalanceComponent";
+import {
+  getPlayers,
+  postMatch,
+  postPlayerAnalysis,
+  postTeamAnalysis
+} from "../../ApiClient";
 
 class AddMatchForm extends Component {
   constructor() {
     super();
     this.state = {
-        matchSuccess: false,
-        matchFail: false,
-        analyzePlayersSuccess: false,
-        analyzePlayersFail: false,
-        analyzeTeamsSuccess: false,
-        analyzeTeamsFail: false,
-        rematchFail: false,
-        rematchSuccess: false,
-        players: [],
-        predicted_win_prob_for_blue: null,
-    };
-
-    this.reset = this.reset.bind(this);
-    this.getSelectRows = this.getSelectRows.bind(this);
-    this.balanceTeams = this.balanceTeams.bind(this);
-    this.getOdds = this.getOdds.bind(this);
-    this.getRematchConfiguration = this.getRematchConfiguration.bind(this);
-  }
-
-  async componentWillMount() {
-    const { data } = await axios.get(
-      process.env.REACT_APP_API_URL + "/kickerscore/api/v1/players"
-    );
-    this.setState({ players: data
-            .sort((a, b) => ('' + a.username).localeCompare(b.username))
-            .map(player => {
-              return player.username;
-            })
-    });
-  }
-
-  reset() {
-    this.setState({
-      matchSuccess: false,
-      matchFail: false,
-      analyzePlayersSuccess: false,
-      analyzePlayersFail: false,
-      analyzeTeamsSuccess: false,
-      analyzeTeamsFail: false,
-      rematchFail: false,
-      rematchSuccess: false
-    });
-  }
-
-  async getOdds() {
-    if (this.blueDefense.value.length == 0 ||
-        this.blueOffense.value.length == 0 ||
-        this.redDefense.value.length == 0 ||
-        this.redOffense.value.length == 0) {
-        return
-    }
-
-    this.reset();
-    const analyzeTeams = {
-        players: {
-            blue: {
-                offense: this.blueOffense.value,
-                defense: this.blueDefense.value,
-            },
-            red: {
-                offense: this.redOffense.value,
-                defense: this.redDefense.value,
-            }
-        }
-    };
-
-    const self = this;
-    await axios
-      .post(process.env.REACT_APP_API_URL + "/kickerscore/api/v1/analyze-teams", analyzeTeams)
-      .then(function (response) {
-        self.setState({
-          analyzeTeamsSuccess: true,
-          predicted_win_prob_for_blue: response.data.predicted_win_prob_for_blue
-        });
-      })
-      .catch(function () {
-        self.setState({
-          analyzeTeamsFail: true
-        });
-      });
-  }
-
-  async balanceTeams() {
-    this.reset();
-    const analyzePlayers = {
-      players: [
-        this.blueOffense.value,
-        this.redOffense.value,
-        this.blueDefense.value,
-        this.redDefense.value
-      ]
-    };
-
-    const self = this;
-    await axios
-      .post(process.env.REACT_APP_API_URL + "/kickerscore/api/v1/analyze-players", analyzePlayers)
-      .then(function (response) {
-        self.setState({
-          analyzePlayersSuccess: true,
-          predicted_win_prob_for_blue: response.data.predicted_win_prob_for_blue
-        });
-        self.blueOffense.value = response.data.optimal_team_composition.blue.offense;
-        self.redOffense.value = response.data.optimal_team_composition.red.offense;
-        self.blueDefense.value = response.data.optimal_team_composition.blue.defense;
-        self.redDefense.value = response.data.optimal_team_composition.red.defense;
-      })
-      .catch(function () {
-        self.setState({
-          analyzePlayersFail: true
-        });
-      });
-  }
-
-  async createMatch(e) {
-    e.preventDefault();
-    this.reset();
-    const match = {
-      players: {
-        blue: {
-          offense: this.blueOffense.value,
-          defense: this.blueDefense.value,
-        },
+      addingMatch: false,
+      loadingOdds: false,
+      loadingOddsError: null,
+      predicted_win_prob_for_blue: null,
+      previousSelectedTableHandle: null,
+      selectedTableHandle: null,
+      selectedPlayers: {
         red: {
-          offense: this.redOffense.value,
-          defense: this.redDefense.value,
+          offense: null,
+          defense: null
+        },
+        blue: {
+          offense: null,
+          defense: null
         }
       },
-      points: {
-        blue: this.bluePoints.value,
-        red: this.redPoints.value
-      }
+      popoverOpen: false
     };
-    const self = this;
-    await axios
-      .post(process.env.REACT_APP_API_URL + "/kickerscore/api/v1/match", match)
-      .then(function () {
-        self.setRematchConfiguration(match.players);
-        self.createMatchForm.reset();
-        self.setState({
-          matchSuccess: true,
-          analysis: null
-        });
-      })
-      .catch(function () {
-        self.setState({
-          matchFail: true
-        });
-      });
+
+    this.balanceTeams = this.balanceTeams.bind(this);
   }
 
-  getRematchConfiguration() {
-    this.reset();
-    const rematchConfiguration = JSON.parse(sessionStorage.getItem('rematchConfiguration'));
-    if (rematchConfiguration == null) {
-      this.setState({
-        rematchFail: true
-      });
-
-      return
-    }
-
-    this.blueOffense.value = rematchConfiguration.blue.offense;
-    this.redOffense.value = rematchConfiguration.red.offense;
-    this.blueDefense.value = rematchConfiguration.blue.defense;
-    this.redDefense.value = rematchConfiguration.red.defense;
-
+  async componentDidMount() {
+    const data = await getPlayers();
     this.setState({
-      rematchSuccess: true
+      players: data
     });
-  }
 
-  setRematchConfiguration(rematchConfiguration) {
-    sessionStorage.setItem('rematchConfiguration', JSON.stringify(rematchConfiguration));
-  }
+    const flashHandle = handleName => {
+      d3.select(`g#${handleName}`)
+        .transition()
+        .duration(700)
+        .attr("opacity", 0.5)
+        .transition()
+        .duration(700)
+        .attr("opacity", 1)
+        .on("end", () => flashHandle(handleName));
+    };
 
-  getSelectRows() {
-      return [''].concat(this.state.players)
-        .map((player, i) => {
-          return (
-            <option key={i}>{player}</option>
+    ["red-defense", "red-offense", "blue-defense", "blue-offense"].forEach(
+      circleName => {
+        const onClickHandler = () => {
+          flashHandle(circleName);
+          this.setState({
+            popoverOpen: true,
+            previousSelectedTableHandleName: this.state.selectedTableHandleName,
+            selectedTableHandleName: null,
+            selectedTableHandle: null
+          });
+
+          if (this.state.previousSelectedTableHandleName !== circleName) {
+            this.setState({
+              selectedTableHandleName: circleName,
+              selectedTableHandle: circle.node()
+            });
+          }
+
+          this.removeHandleAnimation(
+            this.state.previousSelectedTableHandleName
           );
-        });
+        };
+        const circle = d3.select(`ellipse#${circleName}`);
+        const circleText = d3.select(`text#${circleName}`);
+        circle.on("click", onClickHandler);
+        circleText.on("click", onClickHandler);
+      }
+    );
   }
 
-  getPointRange() {
-      return [''].concat(rangeInclusive(0,20,1))
-        .map((player, i) => {
-          return (
-            <option key={i}>{player}</option>
-          );
+  removeHandleAnimation = handleName => {
+    d3.select(`g#${handleName}`)
+      .attr("opacity", 1)
+      .interrupt();
+  };
+
+  balanceTeams = () => {
+    const playerList = [
+      ...Object.values(this.state.selectedPlayers.red),
+      ...Object.values(this.state.selectedPlayers.blue)
+    ];
+    postPlayerAnalysis(playerList).then(
+      response => {
+        this.setState({
+          analyzePlayersSuccess: true,
+          predicted_win_prob_for_blue: response.predicted_win_prob_for_blue
         });
-  }
+        this.updatePlayerDisplay(response.optimal_team_composition);
+      },
+      () => {
+        this.setState({
+          analyzePlayersFail: true
+        });
+      }
+    );
+  };
+
+  updatePlayerDisplay = playerSetup => {
+    d3.select("text#red-defense").text(
+      playerSetup.red.defense[0].toUpperCase()
+    );
+    d3.select("text#red-defense-sm").text(playerSetup.red.defense);
+    d3.select("text#red-offense").text(
+      playerSetup.red.offense[0].toUpperCase()
+    );
+    d3.select("text#red-offense-sm").text(playerSetup.red.offense);
+    d3.select("text#blue-defense").text(
+      playerSetup.blue.defense[0].toUpperCase()
+    );
+    d3.select("text#blue-defense-sm").text(playerSetup.blue.defense);
+    d3.select("text#blue-offense").text(
+      playerSetup.blue.offense[0].toUpperCase()
+    );
+    d3.select("text#blue-offense-sm").text(playerSetup.blue.offense);
+  };
+
+  createMatch = (bluePoints, redPoints) => {
+    this.setState({ addingMatch: true });
+    return postMatch(this.state.selectedPlayers, {
+      blue: bluePoints,
+      red: redPoints
+    }).then(
+      () => {
+        this.setState({
+          analysis: null,
+          addingMatch: false
+        });
+      },
+      () => {
+        this.setState({
+          addingMatch: false
+        });
+      }
+    );
+  };
+
+  playersComplete = playersObj => {
+    const flatPlayers = new Set([
+      ...Object.values(playersObj.red).filter(val => val),
+      ...Object.values(playersObj.blue).filter(val => val)
+    ]);
+    return flatPlayers.size === 4;
+  };
+
+  selectPlayer = (color, position, name, avatarUrl) => {
+    const playersCopy = { ...this.state.selectedPlayers };
+    playersCopy[color][position] = name;
+    // d3.select(`text#${this.state.selectedTableHandleName}`).text(
+    //   name[0].toUpperCase()
+    // );
+    window.d3 = d3;
+
+    d3.select(`image#${this.state.selectedTableHandleName}`)
+      .attr("xlink:href", avatarUrl)
+      .attr("width", 192)
+      .attr("height", 192);
+    d3.select(`ellipse#${this.state.selectedTableHandleName}`).style(
+      "fill",
+      `url(#pattern-${this.state.selectedTableHandleName})`
+    );
+    d3.select(`text#${this.state.selectedTableHandleName}`).text("");
+    d3.select(`text#${this.state.selectedTableHandleName}-sm`).text(name);
+    this.closePopOver();
+    if (this.playersComplete(playersCopy)) {
+      this.setState({ selectedPlayers: playersCopy, loadingOdds: true }, () => {
+        // TODO: move to componentDidUpdate instead
+        postTeamAnalysis(playersCopy).then(
+          response => {
+            this.setState({
+              loadingOdds: false,
+              predicted_win_prob_for_blue: response.predicted_win_prob_for_blue
+            });
+          },
+          () => {
+            this.setState({
+              loadingOdds: false,
+              loadingOddsError: "Something went wrong"
+            });
+          }
+        );
+      });
+    } else {
+      this.setState({ selectedPlayers: playersCopy });
+    }
+  };
+
+  selectedPlayersAsList = () => {
+    const p = this.state.selectedPlayers;
+    return [
+      p.blue.offense,
+      p.blue.defense,
+      p.red.offense,
+      p.red.defense
+    ].filter(n => n);
+  };
+
+  playerRows = (color, position) => {
+    // const selectedList = this.selectedPlayersAsList();
+    return (
+      <ListGroup flush>
+        {this.state.players
+          // .filter(p => !selectedList.includes(p.username))
+          .sort((a, b) => ("" + a.username).localeCompare(b.username))
+          .map(player => (
+            <ListGroupItem
+              key={player.username}
+              tag="button"
+              action
+              onClick={() =>
+                this.selectPlayer(
+                  color,
+                  position,
+                  player.username,
+                  player.avatar
+                )
+              }
+            >
+              <div
+                style={{
+                  fontSize: "2em",
+                  float: "left",
+                  height: 50,
+                  width: 50,
+                  backgroundColor: "rgb(235,235,235)",
+                  textAlign: "center",
+                  borderRadius: 50,
+                  marginRight: ".2em",
+                  backgroundImage: `url(${player.avatar})`,
+                  backgroundSize: "cover"
+                }}
+              />
+              <div style={{ fontSize: "2em" }}>{player.username}</div>
+            </ListGroupItem>
+          ))}
+      </ListGroup>
+    );
+  };
+
+  closePopOver = () => {
+    this.setState({ popoverOpen: false });
+    this.removeHandleAnimation(this.state.selectedTableHandleName);
+  };
 
   render() {
+    const {
+      loadingOdds,
+      loadingOddsError,
+      predicted_win_prob_for_blue,
+      addingMatch
+    } = this.state;
     return (
-      <Container>
-        <Row>
-          <Form
-            innerRef={form => (this.createMatchForm = form)}
-            onSubmit={e => this.createMatch(e)}
+      <Container className="text-center">
+        {!!this.state.selectedTableHandle && (
+          <Popover
+            placement="bottom"
+            isOpen={this.state.popoverOpen}
+            target={this.state.selectedTableHandle}
+            style={{ width: "15em" }}
+            toggle={this.closePopOver}
           >
-            <FormGroup>
-              <Row>
-              <Col>
-              <Row>
-                <Col></Col>
-                <Col>
-                  <h2>Points</h2>
-                  <Row>
-                    <Col>
-                      <Input
-                        type="select"
-                        name="redPoints"
-                        innerRef={input => (this.redPoints = input)}
-                        placeholder="with a placeholder"
-                      >
-                        {this.getPointRange()}
-                      </Input>
-                    </Col>
-                      <h2>-</h2>
-                    <Col>
-                      <Input
-                        type="select"
-                        name="bluePoints"
-                        innerRef={input => (this.bluePoints = input)}
-                        placeholder="with a placeholder"
-                      >
-                          {this.getPointRange()}
-                      </Input>
-                    </Col>
-                  </Row>
-                </Col>
-                <Col></Col>
-              </Row>
-              <Row>
-                <Col>
-                  <h2>Red</h2>
-                  <Label>Defense:</Label>
-                  <Input
-                    type="select"
-                    name="redDefense"
-                    innerRef={input => (this.redDefense = input)}
-                    placeholder="with a placeholder"
-                    onChange={this.getOdds}>
-                      {this.getSelectRows()}
-                  </Input>
-                  <Label>Offense:</Label>
-                  <Input
-                    type="select"
-                    name="redOffense"
-                    innerRef={input => (this.redOffense = input)}
-                    placeholder="with a placeholder"
-                    onChange={this.getOdds}>
-                      {this.getSelectRows()}
-                  </Input>
-                </Col>
-                <Col>
-                  <Media left>
-            <Media style={imgStyle} object src={ FoosballTablePicture } alt="My PlaceHolder Picture" />
-          </Media>
-                </Col>
-                <Col>
-                  <h2>Blue</h2>
-                  <Label>Offense:</Label>
-                  <Input
-                    type="select"
-                    name="blueOffense"
-                    innerRef={input => (this.blueOffense = input)}
-                    placeholder="with a placeholder"
-                    onChange={this.getOdds}>
-                      {this.getSelectRows()}
-                  </Input>
-                  <Label>Defense:</Label>
-                  <Input
-                    type="select"
-                    name="blueDefense"
-                    innerRef={input => (this.blueDefense = input)}
-                    placeholder="with a placeholder"
-                    onChange={this.getOdds}>
-                      {this.getSelectRows()}
-                  </Input>
-                </Col>
-              </Row>
-              <div>
-                  {this.state.predicted_win_prob_for_blue ?
-                <Container>
-                    <Row>
-                  <Col />
-                  <Col>
-                    <h2>Odds</h2>
-                  </Col>
-                  <Col />
-                </Row>
-                <Row>
-                  <Col />
-                  <Col>
-                    <h3>{100 - Math.round(this.state.predicted_win_prob_for_blue * 100)} - {Math.round(this.state.predicted_win_prob_for_blue * 100)}</h3>
-                  </Col>
-                  <Col />
-                </Row>
-                </Container>
-                      : null}
+            <PopoverHeader>
+              <div className="text-center">Players</div>
+            </PopoverHeader>
+            <PopoverBody style={{ paddingLeft: 0, paddingRight: 0 }}>
+              <div
+                style={{
+                  maxHeight: "30em",
+                  overflowY: "auto",
+                  padding: "-5px"
+                }}
+              >
+                {this.playerRows(
+                  ...this.state.selectedTableHandleName.split("-")
+                )}
               </div>
-              </Col>
-              <Row>
-                <Col style={{marginLeft: '20px'}}>
-                    <Row>
-                  <Button onClick={this.balanceTeams}>Balance Teams → </Button>
-                    </Row>
-                    <Row style={{marginTop: '20px'}}>
-                  <Button type="submit">Add Match → </Button>
-                    </Row>
-                    <Row style={{marginTop: '20px'}}>
-                  <Button onClick={this.getRematchConfiguration}>Rematch → </Button>
-                    </Row>
-                </Col>
-              </Row>
-              </Row>
-            </FormGroup>
-          </Form>
+            </PopoverBody>
+          </Popover>
+        )}
+        <Row>
+          <Col>
+            <AddMatchComponent
+              onAddMatch={this.createMatch}
+              canAddMatch={this.playersComplete(this.state.selectedPlayers)}
+              addingMatch={addingMatch}
+            />
+          </Col>
         </Row>
-        <div onClick={this.reset}>
-          {this.state.matchSuccess ? <Row><Alert color="success">Match Added</Alert></Row> : null}
-        </div>
-        <div onClick={this.reset}>
-          {this.state.matchFail ? <Row><Alert color="danger">Something went wrong</Alert></Row> : null}
-        </div>
-        <div onClick={this.reset}>
-          {this.state.analyzePlayersSuccess ? <Row><Alert color="success">Teams Balanced</Alert></Row> : null}
-        </div>
-        <div onClick={this.reset}>
-          {this.state.analyzePlayersFail ? <Row><Alert color="danger">Something went wrong</Alert></Row> : null}
-        </div>
-        <div onClick={this.reset}>
-          {this.state.analyzeTeamsSuccess ? <Row><Alert color="success">Odds Computed</Alert></Row> : null}
-        </div>
-        <div onClick={this.reset}>
-          {this.state.analyzeTeamsFail ? <Row><Alert color="danger">Something went wrong</Alert></Row> : null}
-        </div>
-        <div onClick={this.reset}>
-          {this.state.rematchSuccess ? <Row><Alert color="success">Rematch Configured</Alert></Row> : null}
-        </div>
-        <div onClick={this.reset}>
-          {this.state.rematchFail ? <Row><Alert color="danger">No Previous Match Found</Alert></Row> : null}
-        </div>
+        <Row>
+          <TableSVG style={{ height: "60vh" }} />
+        </Row>
+
+        {(loadingOdds || loadingOddsError || predicted_win_prob_for_blue) && (
+          <Row style={{ margin: "2em" }}>
+            <Col>
+              <GetOddsAndBalanceComponent
+                blue={predicted_win_prob_for_blue}
+                red={1 - predicted_win_prob_for_blue}
+                loadingOdds={loadingOdds}
+                loadingOddsError={loadingOddsError}
+                onGetBalance={this.balanceTeams}
+              />
+            </Col>
+          </Row>
+        )}
       </Container>
     );
   }
