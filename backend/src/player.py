@@ -4,7 +4,9 @@ from models import Player
 
 class PlayersResource(Resource):
     def get(self):
-        return list(map(lambda x: x.serialize(), Player.query.filter_by(active=True)))
+        players = Player.query.filter_by(active=True)
+        players = filter(lambda x: x.num_matches > 0, players)
+        return list(map(lambda x: x.serialize(), players))
 
 
 class PlayerResource(Resource):

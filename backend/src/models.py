@@ -88,6 +88,18 @@ class Player(db.Model):
     rating_mu_defense = db.Column(db.Float, nullable=False)
     rating_sigma_defense = db.Column(db.Float, nullable=False)
 
+    blue_offense_matches = db.relationship('Match', foreign_keys='Match.blue_offense_player', lazy=True)
+    blue_defense_matches = db.relationship('Match', foreign_keys='Match.blue_defense_player', lazy=True)
+    red_offense_matches = db.relationship('Match', foreign_keys='Match.red_offense_player', lazy=True)
+    red_defense_matches = db.relationship('Match', foreign_keys='Match.red_defense_player', lazy=True)
+
+    @property
+    def num_matches(self):
+        return len(self.blue_offense_matches) + \
+               len(self.blue_defense_matches) + \
+               len(self.red_offense_matches) + \
+               len(self.red_defense_matches)
+
     def with_updated_slack_info(self, username: str, avatar: str):
         self.slack_avatar = avatar
         self.slack_username = username
@@ -134,5 +146,6 @@ class Player(db.Model):
             },
             "rank_overall": pos,
             "rank_offense": pos_offense,
-            "rank_defense": pos_defense
+            "rank_defense": pos_defense,
+            "num_matches": self.num_matches
         }
