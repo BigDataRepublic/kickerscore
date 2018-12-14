@@ -9,7 +9,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from match import MatchResource, MatchesResource, AnalyzePlayers, AnalyzeTeams
 from player import PlayerResource, PlayersResource
 from db import *
-from slack_sync import sync_new_left_channel_members, sync_existing_members_info
+from slack_sync import sync_new_and_left_channel_members, sync_existing_members_info
 
 
 app = Flask(__name__)
@@ -27,8 +27,8 @@ migrate = Migrate(app, db)
 # instances of this app. Need to ensure there's just one scheduler!
 scheduler = BackgroundScheduler(timezone="Europe/Amsterdam")
 # Check channel if there are new players
-new_player_sync = scheduler.add_job(sync_new_left_channel_members, "interval", seconds=30)
-# Revisist existing players and update info if required
+new_player_sync = scheduler.add_job(sync_new_and_left_channel_members, "interval", seconds=30)
+# Revisit existing players and update info if changed
 existing_player_sync = scheduler.add_job(sync_existing_members_info, "interval", minutes=1)
 scheduler.start()
 # Shut down the scheduler when exiting the app

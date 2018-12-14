@@ -42,8 +42,6 @@ class AddMatchForm extends Component {
       },
       popoverOpen: false
     };
-
-    this.balanceTeams = this.balanceTeams.bind(this);
   }
 
   async componentDidMount() {
@@ -110,7 +108,11 @@ class AddMatchForm extends Component {
           analyzePlayersSuccess: true,
           predicted_win_prob_for_blue: response.predicted_win_prob_for_blue
         });
-        this.updatePlayerDisplay(response.optimal_team_composition);
+        const playerSetup = response.optimal_team_composition;
+        this.updatePlayerDetails(playerSetup.red.offense, "red-offense");
+        this.updatePlayerDetails(playerSetup.red.defense, "red-defense");
+        this.updatePlayerDetails(playerSetup.blue.offense, "blue-offense");
+        this.updatePlayerDetails(playerSetup.blue.defense, "blue-defense");
       },
       () => {
         this.setState({
@@ -120,23 +122,16 @@ class AddMatchForm extends Component {
     );
   };
 
-  updatePlayerDisplay = playerSetup => {
-    d3.select("text#red-defense").text(
-      playerSetup.red.defense[0].toUpperCase()
-    );
-    d3.select("text#red-defense-sm").text(playerSetup.red.defense);
-    d3.select("text#red-offense").text(
-      playerSetup.red.offense[0].toUpperCase()
-    );
-    d3.select("text#red-offense-sm").text(playerSetup.red.offense);
-    d3.select("text#blue-defense").text(
-      playerSetup.blue.defense[0].toUpperCase()
-    );
-    d3.select("text#blue-defense-sm").text(playerSetup.blue.defense);
-    d3.select("text#blue-offense").text(
-      playerSetup.blue.offense[0].toUpperCase()
-    );
-    d3.select("text#blue-offense-sm").text(playerSetup.blue.offense);
+  updatePlayerDetails = (playerName, position) => {
+    const player = this.state.players.find(p => p.username === playerName);
+
+    d3.select(`image#${position}`)
+      .attr("xlink:href", player.avatar)
+      .attr("width", 192)
+      .attr("height", 192);
+    d3.select(`ellipse#${position}`).style("fill", `url(#pattern-${position})`);
+    d3.select(`text#${position}-sm`).text(playerName);
+    d3.select(`text#${position}`).text("");
   };
 
   createMatch = (bluePoints, redPoints) => {
@@ -170,21 +165,8 @@ class AddMatchForm extends Component {
   selectPlayer = (color, position, name, avatarUrl) => {
     const playersCopy = { ...this.state.selectedPlayers };
     playersCopy[color][position] = name;
-    // d3.select(`text#${this.state.selectedTableHandleName}`).text(
-    //   name[0].toUpperCase()
-    // );
-    window.d3 = d3;
 
-    d3.select(`image#${this.state.selectedTableHandleName}`)
-      .attr("xlink:href", avatarUrl)
-      .attr("width", 192)
-      .attr("height", 192);
-    d3.select(`ellipse#${this.state.selectedTableHandleName}`).style(
-      "fill",
-      `url(#pattern-${this.state.selectedTableHandleName})`
-    );
-    d3.select(`text#${this.state.selectedTableHandleName}`).text("");
-    d3.select(`text#${this.state.selectedTableHandleName}-sm`).text(name);
+    this.updatePlayerDetails(name, `${color}-${position}`);
     this.closePopOver();
     if (this.playersComplete(playersCopy)) {
       this.setState({ selectedPlayers: playersCopy, loadingOdds: true }, () => {
