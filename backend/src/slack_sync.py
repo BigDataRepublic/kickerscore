@@ -19,29 +19,29 @@ sc = SlackClient(slack_oauth_token)
 
 
 def sync_new_and_left_channel_members():
+    current_slack_members = []
     for channel_id in kickerscore_channel_ids:
+        logger.info("Running new channel member check for {}".format(channel_id))
         _sync_new_and_left_channel_members_per_channel(channel_id)
+        current_slack_members += sc.api_call(
+            "conversations.members", channel=channel_id)["members"]
 
-
-def _sync_new_and_left_channel_members_per_channel(channel_id):
-    logger.info("Running new channel member check for {}".format(channel_id))
-    current_slack_members = set(sc.api_call(
-        "conversations.members", channel=channel_id)["members"])
     current_db_players = Player.query.all()
     current_db_players_ids = set([p.slack_id for p in current_db_players])
     to_deactivate_players = current_db_players_ids - current_slack_members
     new_players = current_slack_members ^ current_db_players_ids - to_deactivate_players
 
+    _sync_new_and_left_channel_members_per_channel(new_players, to_deactivate_players)
+
+
+def _sync_new_and_left_channel_members_per_channel(new_players, to_deactivate_players):
+    current_db_players = Player.query.all()
     logger.info(f"Going to add {new_players} new player(s)")
     for np in new_players:
         player_info = sc.api_call("users.info", user=np)["user"]
-        if len(player_info["profile"]["display_name_normalized"]):
-            player_name = player_info["profile"]["display_name_normalized"]
-        else:
-            player_name = player_info["profile"]["real_name_normalized"]
         to_add = Player(
             slack_id=player_info["id"],
-            slack_username=player_name,
+            slack_username=player_info["profile"]["display_name_normalized"],
             slack_avatar=player_info["profile"]["image_192"],
             rating_mu=MU,
             rating_mu_offense=MU,
