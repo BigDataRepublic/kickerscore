@@ -95,11 +95,11 @@ class Player(db.Model):
 
     def serialize(self):
         sub = db.session.query(
-            Player.slack_username,
+            Player.slack_id,
             func.row_number().over(order_by=desc(Player.rating_mu)).label('pos')
         ).subquery()
         pos = db.session.query(sub.c.pos) \
-            .filter(sub.c.slack_username == self.slack_username) \
+            .filter(sub.c.slack_id == self.slack_id) \
             .scalar() - 1
 
         sub = db.session.query(
