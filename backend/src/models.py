@@ -103,19 +103,19 @@ class Player(db.Model):
             .scalar() - 1
 
         sub = db.session.query(
-            Player.slack_username, func.row_number()
+            Player.slack_id, func.row_number()
             .over(order_by=desc(Player.rating_mu_offense)).label('pos')
         ).subquery()
         pos_offense = db.session.query(sub.c.pos) \
-            .filter(sub.c.slack_username == self.slack_username) \
+            .filter(sub.c.slack_id == self.slack_id) \
             .scalar() - 1
 
         sub = db.session.query(
-            Player.slack_username, func.row_number()
+            Player.slack_id, func.row_number()
             .over(order_by=desc(Player.rating_mu_defense)).label('pos')
         ).subquery()
         pos_defense = db.session.query(sub.c.pos) \
-            .filter(sub.c.slack_username == self.slack_username) \
+            .filter(sub.c.slack_id == self.slack_id) \
             .scalar() - 1
 
         return {
