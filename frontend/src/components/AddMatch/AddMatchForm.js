@@ -106,7 +106,8 @@ class AddMatchForm extends Component {
       response => {
         this.setState({
           analyzePlayersSuccess: true,
-          predicted_win_prob_for_blue: response.predicted_win_prob_for_blue
+          predicted_win_prob_for_blue: response.predicted_win_prob_for_blue,
+          selectedPlayers: response.optimal_team_composition
         });
         const playerSetup = response.optimal_team_composition;
         this.updatePlayerDetails(playerSetup.red.offense, "red-offense");
@@ -130,7 +131,7 @@ class AddMatchForm extends Component {
       .attr("width", 192)
       .attr("height", 192);
     d3.select(`ellipse#${position}`).style("fill", `url(#pattern-${position})`);
-    d3.select(`text#${position}-sm`).text(playerName);
+    d3.select(`text#${position}-sm`).text(this.shortenPlayerName(playerName));
     d3.select(`text#${position}`).text("");
   };
 
@@ -201,12 +202,15 @@ class AddMatchForm extends Component {
     ].filter(n => n);
   };
 
+  shortenPlayerName = playerName =>
+    playerName.length >= 12 ? playerName.substring(0, 12) + "..." : playerName;
+
   playerRows = (color, position) => {
-    // const selectedList = this.selectedPlayersAsList();
+    const selectedList = this.selectedPlayersAsList();
     return (
       <ListGroup flush>
         {this.state.players
-          // .filter(p => !selectedList.includes(p.username))
+          .filter(p => !selectedList.includes(p.username))
           .sort((a, b) => ("" + a.username).localeCompare(b.username))
           .map(player => (
             <ListGroupItem
@@ -236,7 +240,9 @@ class AddMatchForm extends Component {
                   backgroundSize: "cover"
                 }}
               />
-              <div style={{ fontSize: "2em" }}>{player.username}</div>
+              <div style={{ fontSize: "1.5em", marginTop: "10px" }}>
+                {this.shortenPlayerName(player.username)}
+              </div>
             </ListGroupItem>
           ))}
       </ListGroup>
@@ -262,7 +268,7 @@ class AddMatchForm extends Component {
             placement="bottom"
             isOpen={this.state.popoverOpen}
             target={this.state.selectedTableHandle}
-            style={{ width: "15em" }}
+            style={{ width: "18em" }}
             toggle={this.closePopOver}
           >
             <PopoverHeader>
@@ -293,7 +299,7 @@ class AddMatchForm extends Component {
           </Col>
         </Row>
         <Row>
-          <TableSVG style={{ height: "60vh" }} />
+          <TableSVG style={{ height: "60vh", width: "80vw" }} />
         </Row>
 
         {(loadingOdds || loadingOddsError || predicted_win_prob_for_blue) && (

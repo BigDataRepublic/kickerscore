@@ -6,6 +6,7 @@ ENV PATH /usr/src/app/node_modules/.bin:$PATH
 WORKDIR /usr/src/app
 
 RUN npm install
+RUN npm run build
 
 EXPOSE 3000
-ENTRYPOINT ["npm", "start"]
+ENTRYPOINT ["serve", "-s", "/usr/src/app/build", "-p", "3000"]
