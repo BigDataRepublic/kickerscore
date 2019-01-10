@@ -40,9 +40,13 @@ def _sync_new_and_left_channel_members_per_channel(new_players, to_deactivate_pl
     logger.info(f"Going to add {new_players} new player(s)")
     for np in new_players:
         player_info = sc.api_call("users.info", user=np)["user"]
+        if len(player_info["profile"]["display_name_normalized"]):
+            player_name = player_info["profile"]["display_name_normalized"]
+        else:
+            player_name = player_info["profile"]["real_name_normalized"]
         to_add = Player(
             slack_id=player_info["id"],
-            slack_username=player_info["profile"]["display_name_normalized"],
+            slack_username=player_name,
             slack_avatar=player_info["profile"]["image_192"],
             rating_mu=MU,
             rating_mu_offense=MU,
