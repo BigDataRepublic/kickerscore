@@ -25,6 +25,8 @@ def sync_new_and_left_channel_members():
         current_slack_members += sc.api_call(
             "conversations.members", channel=channel_id)["members"]
 
+    current_slack_members = set(current_slack_members)
+
     current_db_players = Player.query.all()
     current_db_players_ids = set([p.slack_id for p in current_db_players])
     to_deactivate_players = current_db_players_ids - current_slack_members
