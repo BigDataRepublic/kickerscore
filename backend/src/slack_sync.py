@@ -22,7 +22,6 @@ def sync_new_and_left_channel_members():
     current_slack_members = []
     for channel_id in kickerscore_channel_ids:
         logger.info("Running new channel member check for {}".format(channel_id))
-        _sync_new_and_left_channel_members_per_channel(channel_id)
         current_slack_members += sc.api_call(
             "conversations.members", channel=channel_id)["members"]
 
