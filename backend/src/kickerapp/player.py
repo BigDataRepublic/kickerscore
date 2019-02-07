@@ -1,10 +1,10 @@
 from flask_restful import Resource, reqparse
-from models import Player
+from .view_models import AddMatchPlayerListViewModel, PlayerInformationViewModel
 
 
 class PlayersResource(Resource):
     def get(self):
-        return list(map(lambda x: x.serialize(), Player.query.filter_by(active=True)))
+        return AddMatchPlayerListViewModel().serialize()
 
 
 class PlayerResource(Resource):
@@ -15,9 +15,9 @@ class PlayerResource(Resource):
         args = parser.parse_args()
         username = args['username'].lower()
 
-        player = Player.query.filter_by(username=username).first()
+        player_view_model = PlayerInformationViewModel(username=username)
 
-        if player is None:
+        if not player_view_model.exists():
             return f"Player with username {username} not found", 404
 
-        return player.serialize()
+        return player_view_model.serialize()

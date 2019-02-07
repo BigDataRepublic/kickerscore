@@ -21,13 +21,13 @@ export default class GetOddsAndBalanceComponent extends Component {
             <Row key="odds">
                 <Col />
                 <Col>
-                    <h2>{blue.toPrecision(2)}</h2>
+                    <h2>{red.toPrecision(2)}</h2>
                 </Col>
                 <Col>
                     <h2>-</h2>
                 </Col>
                 <Col>
-                    <h2>{red.toPrecision(2)}</h2>
+                    <h2>{blue.toPrecision(2)}</h2>
                 </Col>
                 <Col />
             </Row>

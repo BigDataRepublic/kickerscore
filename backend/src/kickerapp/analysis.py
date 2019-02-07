@@ -1,7 +1,8 @@
 from trueskill import Rating, quality, rate, TrueSkill
 import itertools
 import math
-from config import *
+from .config import *
+import numpy as np
 
 
 def win_probability(ts, team1, team2):
@@ -12,18 +13,22 @@ def win_probability(ts, team1, team2):
     return ts.cdf(delta_mu / denom)
 
 
-def analyze_players(players):
+def softmax(x):
+    """Compute softmax values for each sets of scores in x."""
+    e_x = np.exp(x - np.max(x))
+    return e_x / e_x.sum(axis=0)
+
+
+def analyze_players(players, best_match_only):
     if len(players) < 2 or len(players) > 4:
         return
 
     ts = TrueSkill(mu=MU, sigma=SIGMA, beta=BETA, tau=TAU, draw_probability=DRAW_PROB)
 
-    possible_positions = itertools.permutations(players, len(players))
-
-    final_composition = []
-    final_blue_team = []
-    final_red_team = []
-    final_match_balance = 0
+    possible_positions = list(itertools.permutations(players, len(players)))
+    blue_teams = []
+    red_teams = []
+    match_balances = []
 
     for pos in possible_positions:
         if len(pos) == 2:
@@ -49,11 +54,24 @@ def analyze_players(players):
 
         match_balance = ts.quality([blue_team, red_team])
 
-        if match_balance > final_match_balance:
-            final_match_balance = match_balance
-            final_composition = pos
-            final_blue_team = blue_team
-            final_red_team = red_team
+        match_balances.append(match_balance)
+        blue_teams.append(blue_team)
+        red_teams.append(red_team)
+
+    # Draw from positions with weights `match_balances`
+    if best_match_only:
+        final_ix = np.argmax(match_balances)
+    else:
+        softmaxed = [x / sum(match_balances) for x in match_balances]
+        softmaxed = softmax([x * EXPLOITATION_FACTOR for x in softmaxed])
+        final_ix = np.random.choice(range(len(softmaxed)), p=softmaxed)
+
+        print(softmaxed)
+
+    final_composition = possible_positions[final_ix]
+    final_match_balance = match_balances[final_ix]
+    final_blue_team = blue_teams[final_ix]
+    final_red_team = red_teams[final_ix]
 
     if len(players) == 2:
         return {
@@ -115,14 +133,14 @@ def _build_team(rating1, rating2):
 def analyze_teams(player_blue_offense, player_blue_defense, player_red_offense, player_red_defense):
     ts = TrueSkill(mu=MU, sigma=SIGMA, beta=BETA, tau=TAU, draw_probability=DRAW_PROB)
 
-    player_blue_offense_rating = Rating(mu=player_blue_offense.rating_mu,
-                                        sigma=player_blue_offense.rating_sigma) if player_blue_offense is not None else None
-    player_blue_defense_rating = Rating(mu=player_blue_defense.rating_mu,
-                                        sigma=player_blue_defense.rating_sigma) if player_blue_defense is not None else None
-    player_red_offense_rating = Rating(mu=player_red_offense.rating_mu,
-                                       sigma=player_red_offense.rating_sigma) if player_red_offense is not None else None
-    player_red_defense_rating = Rating(mu=player_red_defense.rating_mu,
-                                       sigma=player_red_defense.rating_sigma) if player_red_defense is not None else None
+    player_blue_offense_rating = Rating(mu=player_blue_offense.rating_mu_offense,
+                                        sigma=player_blue_offense.rating_sigma_offense) if player_blue_offense is not None else None
+    player_blue_defense_rating = Rating(mu=player_blue_defense.rating_mu_defense,
+                                        sigma=player_blue_defense.rating_sigma_defense) if player_blue_defense is not None else None
+    player_red_offense_rating = Rating(mu=player_red_offense.rating_mu_offense,
+                                       sigma=player_red_offense.rating_sigma_offense) if player_red_offense is not None else None
+    player_red_defense_rating = Rating(mu=player_red_defense.rating_mu_defense,
+                                       sigma=player_red_defense.rating_sigma_defense) if player_red_defense is not None else None
 
     blue_team = _build_team(player_blue_offense_rating, player_blue_defense_rating)
     red_team = _build_team(player_red_offense_rating, player_red_defense_rating)

@@ -47,8 +47,9 @@ class AddMatchForm extends Component {
   async componentDidMount() {
     const data = await getPlayers();
     this.setState({
-      players: data
+      players: data.players
     });
+    console.log(data)
 
     const flashHandle = handleName => {
       d3.select(`g#${handleName}`)
@@ -203,7 +204,7 @@ class AddMatchForm extends Component {
   };
 
   shortenPlayerName = playerName =>
-    playerName.length >= 12 ? playerName.substring(0, 12) + "..." : playerName;
+    playerName.length > 12 ? playerName.substring(0, 11) + "..." : playerName;
 
   playerRows = (color, position) => {
     const selectedList = this.selectedPlayersAsList();

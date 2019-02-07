@@ -1,5 +1,6 @@
 const BASE_URL = process.env.REACT_APP_API_URL || "";
 const V1_URL = `${BASE_URL}/kickerscore/api/v1`;
+const V2_URL = `${BASE_URL}/kickerscore/api/v2`;
 
 const parseJSON = response => response.json();
 
@@ -15,12 +16,17 @@ const checkResponseStatus = response => {
 };
 
 export const getPlayers = async () =>
-    fetch(`${V1_URL}/players`)
+    fetch(`${V2_URL}/players`)
+        .then(checkResponseStatus)
+        .then(parseJSON);
+
+export const getLeaderboard = async () =>
+    fetch(`${V2_URL}/leaderboard`)
         .then(checkResponseStatus)
         .then(parseJSON);
 
 export const postMatch = (playersData, points) =>
-    fetch(`${V1_URL}/match`, {
+    fetch(`${V2_URL}/match`, {
         method: "POST",
         body: JSON.stringify({ players: playersData, points }),
         headers: {
@@ -31,7 +37,7 @@ export const postMatch = (playersData, points) =>
         .then(parseJSON);
 
 export const postPlayerAnalysis = async playerList =>
-    fetch(`${V1_URL}/analyze-players`, {
+    fetch(`${V2_URL}/analyze-players`, {
         method: "POST",
         body: JSON.stringify({ players: playerList }),
         headers: {
@@ -42,7 +48,7 @@ export const postPlayerAnalysis = async playerList =>
         .then(parseJSON);
 
 export const postTeamAnalysis = async teamComposition =>
-    fetch(`${V1_URL}/analyze-teams`, {
+    fetch(`${V2_URL}/analyze-teams`, {
         method: "POST",
         body: JSON.stringify({ players: teamComposition }),
         headers: {

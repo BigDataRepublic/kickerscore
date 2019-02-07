@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Table } from "reactstrap";
 import { Container, Row, Col } from "reactstrap";
-import { getPlayers } from "../../ApiClient";
+import { getLeaderboard } from "../../ApiClient";
 
 class Home extends Component {
   constructor() {
@@ -12,28 +12,31 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    this.getPlayers();
-    this.intervalID = setInterval(() => this.getPlayers(), 10000);
+    this.getLeaderboard();
+    this.intervalID = setInterval(() => this.getLeaderboard(), 10000);
   }
 
   componentWillUnmount() {
     clearInterval(this.intervalID);
   }
 
-  async getPlayers() {
-    const data = await getPlayers();
+  async getLeaderboard() {
+    const data = await getLeaderboard();
     this.setState({ players: data });
   }
 
   getTableRows(position) {
-    return this.state.players
-      .sort((a, b) => a[`rank_${position}`] - b[`rank_${position}`])
+    if (this.state.players.length == 0)
+      return;
+
+    return this.state.players[`${position}_players`]
+      .sort((a, b) => a["current_rank"][`${position}`] - b["current_rank"][`${position}`])
       .map((player, i) => {
         return (
-          <tr key={i}>
-            <td>{player[`rank_${position}`] + 1}</td>
+          <tr key={`${position}_${i}`}>
+            <td>{player["current_rank"][`${position}`] + 1}</td>
             <td>{player.username}</td>
-            <td>{Math.round(player.current_trueskill[`${position}`])}</td>
+            <td>{Math.round(player["current_rating"][`${position}`])}</td>
           </tr>
         );
       });
@@ -57,7 +60,7 @@ class Home extends Component {
                     <tr>
                       <th>Rank</th>
                       <th>Name</th>
-                      <th>TrueSkill</th>
+                      <th>Rating</th>
                     </tr>
                   </thead>
                   <tbody>{this.getTableRows(position)}</tbody>
