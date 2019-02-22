@@ -21,7 +21,7 @@ jobs:
             -e POSTGRES_HOST=localhost \
             -e SLACK_OAUTH_TOKEN=${SLACK_OAUTH_TOKEN} \
             -e KICKERSCORE_CHANNEL_ID=${KICKERSCORE_CHANNEL_ID} \
-            -e FLASK_APP=/mnt/src/app
+            -e FLASK_APP=/mnt/src/app \
             -v /mnt \
             -w /mnt/tests \
             bigdatarepublic/kickerscore:$CIRCLE_BRANCH python tests.py
