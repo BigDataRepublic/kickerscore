@@ -14,7 +14,16 @@ jobs:
             -e POSTGRES_PASSWORD=bar \
             -e POSTGRES_DB=kickerscore \
             postgres:10.5-alpine
-      - run: docker run bigdatarepublic/kickerscore:$CIRCLE_BRANCH python tests.py
+      - run: |
+          docker run \
+            -e POSTGRES_USER=foo \
+            -e POSTGRES_PASSWORD=bar \
+            -e POSTGRES_HOST=localhost \
+            -e SLACK_OAUTH_TOKEN=${SLACK_OAUTH_TOKEN} \
+            -e KICKERSCORE_CHANNEL_ID=${KICKERSCORE_CHANNEL_ID} \
+            -e FLASK_APP=/mnt/src/app \
+            -v /mnt \
+            -w /mnt/tests \bigdatarepublic/kickerscore:$CIRCLE_BRANCH python tests.py
 
       - run: docker push bigdatarepublic/kickerscore:$CIRCLE_BRANCH
   frontend:
