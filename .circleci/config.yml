@@ -9,7 +9,7 @@ jobs:
       #- run: docker build -t bigdatarepublic/kickerscore:$CIRCLE_BRANCH backend/
 
       - run: |
-          docker run \
+          docker run -d \
             -e POSTGRES_USER=foo \
             -e POSTGRES_PASSWORD=bar \
             -e POSTGRES_DB=kickerscore \
