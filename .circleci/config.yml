@@ -6,7 +6,7 @@ jobs:
       - checkout
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
 
-      - run: docker build -t bigdatarepublic/kickerscore:$CIRCLE_BRANCH backend/
+      #- run: docker build -t bigdatarepublic/kickerscore:$CIRCLE_BRANCH backend/
 
       - run: |
           docker run \
