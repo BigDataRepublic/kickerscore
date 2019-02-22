@@ -1,9 +1,16 @@
 version: 2.0
 jobs:
-  build:
+  backend:
     machine: yes
     steps:
       - checkout
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker build -t bigdatarepublic/kickerscore:$CIRCLE_BRANCH backend/
+      - run: docker push bigdatarepublic/kickerscore:$CIRCLE_BRANCH
+  frontend:
+    machine: yes
+    steps:
+      - checkout
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run: docker build -t bigdatarepublic/kickerscore:$CIRCLE_BRANCH frontend/
       - run: docker push bigdatarepublic/kickerscore:$CIRCLE_BRANCH
