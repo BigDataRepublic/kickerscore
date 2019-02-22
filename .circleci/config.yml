@@ -23,7 +23,8 @@ jobs:
             -e KICKERSCORE_CHANNEL_ID=${KICKERSCORE_CHANNEL_ID} \
             -e FLASK_APP=/mnt/src/app \
             -v backend:/mnt \
-            -w /mnt/tests \bigdatarepublic/kickerscore:$CIRCLE_BRANCH python tests.py
+            -w /mnt/tests \
+            bigdatarepublic/kickerscore:$CIRCLE_BRANCH python tests.py
 
       - run: docker push bigdatarepublic/kickerscore:$CIRCLE_BRANCH
   frontend:
