@@ -15,7 +15,7 @@ jobs:
             -e POSTGRES_DB=kickerscore \
             postgres:10.5-alpine
       - run: |
-          docker run \
+          docker run -it \
             -e POSTGRES_USER=foo \
             -e POSTGRES_PASSWORD=bar \
             -e POSTGRES_HOST=localhost \
