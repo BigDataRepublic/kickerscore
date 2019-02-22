@@ -22,7 +22,9 @@ jobs:
             -e SLACK_OAUTH_TOKEN=${SLACK_OAUTH_TOKEN} \
             -e KICKERSCORE_CHANNEL_ID=${KICKERSCORE_CHANNEL_ID} \
             -e FLASK_APP=/mnt/src/app \
-            bigdatarepublic/kickerscore:$CIRCLE_BRANCH python tests.py
+            -v /mnt \
+            -w /mnt/tests \
+            bigdatarepublic/kickerscore:$CIRCLE_BRANCH "python tests.py"
 
       - run: docker push bigdatarepublic/kickerscore:$CIRCLE_BRANCH
   frontend:
