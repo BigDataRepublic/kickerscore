@@ -5,5 +5,5 @@ jobs:
     steps:
       - checkout
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - run: docker build -t bigdatarepublic/kickerscore:$CIRCLE_BRANCH .
+      - run: docker build -t bigdatarepublic/kickerscore:$CIRCLE_BRANCH backend/
       - run: docker push bigdatarepublic/kickerscore:$CIRCLE_BRANCH
