@@ -6,7 +6,7 @@ jobs:
       - checkout
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
 
-      #- run: docker build -t bigdatarepublic/kickerscore:$CIRCLE_BRANCH backend/
+      - run: docker build -t bigdatarepublic/kickerscore:$CIRCLE_BRANCH backend/
 
       - run: |
           docker run -d \
@@ -14,8 +14,7 @@ jobs:
             -e POSTGRES_PASSWORD=bar \
             -e POSTGRES_DB=kickerscore \
             postgres:10.5-alpine
-      - run: |
-          docker run bigdatarepublic/kickerscore:$CIRCLE_BRANCH python tests.py
+      - run: docker run bigdatarepublic/kickerscore:$CIRCLE_BRANCH python tests.py
 
       - run: docker push bigdatarepublic/kickerscore:$CIRCLE_BRANCH
   frontend:
