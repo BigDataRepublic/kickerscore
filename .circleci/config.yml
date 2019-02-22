@@ -24,7 +24,7 @@ jobs:
             -e FLASK_APP=/mnt/src/app \
             -v /mnt \
             -w /mnt/tests \
-            bigdatarepublic/kickerscore:$CIRCLE_BRANCH
+            bigdatarepublic/kickerscore:$CIRCLE_BRANCH ls
 
       - run: docker push bigdatarepublic/kickerscore:$CIRCLE_BRANCH
   frontend:
