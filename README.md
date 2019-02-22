@@ -1,5 +1,7 @@
 # Kickerscore
 
+[![CircleCI](https://circleci.com/gh/BigDataRepublic/kickerscore.svg?style=svg)](https://circleci.com/gh/BigDataRepublic/kickerscore)
+
 Kickerscore is an API that provides a way to keep track of scores for kickers/foosball.
 
 * It shows you a ranking of players
