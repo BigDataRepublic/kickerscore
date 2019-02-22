@@ -14,3 +14,8 @@ jobs:
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker build -t bigdatarepublic/kickerscore:$CIRCLE_BRANCH frontend/
       - run: docker push bigdatarepublic/kickerscore:$CIRCLE_BRANCH
+workflows:
+  version: 2
+  build:
+    - backend
+    - frontend
