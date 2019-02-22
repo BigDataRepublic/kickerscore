@@ -24,7 +24,7 @@ jobs:
             -e FLASK_APP=/mnt/src/app \
             -v /mnt \
             -w /mnt/tests \
-            bigdatarepublic/kickerscore:$CIRCLE_BRANCH "python tests.py"
+            bigdatarepublic/kickerscore:$CIRCLE_BRANCH python tests.py
 
       - run: docker push bigdatarepublic/kickerscore:$CIRCLE_BRANCH
   frontend:
