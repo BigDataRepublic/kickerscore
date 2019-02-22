@@ -3,7 +3,6 @@ jobs:
   build:
     machine: yes
     steps:
-      - setup_remote_docker
       - checkout
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker build -t bigdatarepublic/kickerscore:$CIRCLE_BRANCH .
