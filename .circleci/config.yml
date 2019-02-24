@@ -4,38 +4,47 @@ jobs:
     machine: yes
     steps:
       - checkout
-      - run: docker build -t bigdatarepublic/kickerscore:$CIRCLE_SHA1 backend/
-
-      - run: |
-          docker run -d \
-            -e POSTGRES_USER=foo \
-            -e POSTGRES_PASSWORD=bar \
-            -e POSTGRES_DB=kickerscore \
-            --name db \
-            postgres:10.5-alpine
-      - run: sleep 10
-      - run: |
-          docker run \
-            -e POSTGRES_USER=foo \
-            -e POSTGRES_PASSWORD=bar \
-            -e POSTGRES_HOST=db \
-            -e SLACK_OAUTH_TOKEN=${SLACK_OAUTH_TOKEN} \
-            -e KICKERSCORE_CHANNEL_ID=${KICKERSCORE_CHANNEL_ID} \
-            -e FLASK_APP=/mnt/src/app \
-            -v /home/circleci/project/backend:/mnt \
-            -w /mnt/tests \
-            --link db:db \
-            bigdatarepublic/kickerscore:$CIRCLE_SHA1 python tests.py
-
-      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - run: docker push bigdatarepublic/kickerscore:$CIRCLE_SHA1
+      - run:
+          name: Build image
+          command: docker build -t bigdatarepublic/kickerscore:$CIRCLE_SHA1 backend/
+      - run:
+          name: Run integration tests
+          command: |
+            docker run -d \
+              -e POSTGRES_USER=foo \
+              -e POSTGRES_PASSWORD=bar \
+              -e POSTGRES_DB=kickerscore \
+              --name db \
+              postgres:10.5-alpine
+            sleep 10
+            docker run \
+              -e POSTGRES_USER=foo \
+              -e POSTGRES_PASSWORD=bar \
+              -e POSTGRES_HOST=db \
+              -e SLACK_OAUTH_TOKEN=${SLACK_OAUTH_TOKEN} \
+              -e KICKERSCORE_CHANNEL_ID=${KICKERSCORE_CHANNEL_ID} \
+              -e FLASK_APP=/mnt/src/app \
+              -v /home/circleci/project/backend:/mnt \
+              -w /mnt/tests \
+              --link db:db \
+              bigdatarepublic/kickerscore:$CIRCLE_SHA1 python tests.py
+      - run:
+          name: Push image to registry
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push bigdatarepublic/kickerscore:$CIRCLE_SHA1
   frontend:
     machine: yes
     steps:
       - checkout
-      - run: docker build -t bigdatarepublic/kickerscore-frontend:$CIRCLE_SHA1 frontend/
-      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - run: docker push bigdatarepublic/kickerscore-frontend:$CIRCLE_SHA1
+      - run:
+          name: Build image
+          command: docker build -t bigdatarepublic/kickerscore-frontend:$CIRCLE_SHA1 frontend/
+      - run:
+          name: Push image to registry
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push bigdatarepublic/kickerscore-frontend:$CIRCLE_SHA1
 workflows:
   version: 2
   build:
