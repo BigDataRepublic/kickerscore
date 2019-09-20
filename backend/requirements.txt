@@ -10,3 +10,4 @@ psycopg2-binary==2.7.5
 numpy==1.16.0
 pandas==0.24.1
 face_recognition==1.2.3
+ 

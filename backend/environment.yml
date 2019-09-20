@@ -1,6 +1,7 @@
 name: kickerscore
 dependencies:
   - python=3.6.6
+  - cmake
   - pip
   - pip:
     - -r requirements.txt
