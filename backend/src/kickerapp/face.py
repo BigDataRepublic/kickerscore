@@ -63,7 +63,9 @@ class AddFacesResource(Resource):
             return "No users specified", 400
 
         if len(args['embeddings']) != len(args['usernames']):
-            return "Embeddings and usernames should be of the same size, {} != {}".format(len(args['embeddings']), len(args['usernames'])), 200
+            return "Embeddings and usernames should be of the same size, {} != {}".format(
+                len(args['embeddings']),
+                len(args['usernames'])), 200
 
         for user, embedding in zip(args['usernames'], args['embeddings']):
             user = Player.query.filter(func.lower(Player.slack_username) == func.lower(user)).first()
