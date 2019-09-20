@@ -20,7 +20,9 @@ def save_file(image):
     temp_dir = tempfile.gettempdir()
 
     filename = os.path.join(temp_dir, generated_uuid)
-    image.save(filename)
+
+    with open(filename, 'wb') as f:
+        f.write(image)
 
     return filename
 
@@ -28,14 +30,15 @@ def save_file(image):
 class FaceRecognitionResource(Resource):
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('image', type=werkzeug.FileStorage, location='files')
+        parser.add_argument('image', type=str)
 
         args = parser.parse_args()
 
         if args['image'] is None:
             return "No image specified", 400
 
-        filename = save_file(args['image'])
+        decoded = base64.b64decode(args['image'])
+        filename = save_file(decoded)
 
         recognized_faces = recognize_faces(filename)
         os.remove(filename)
