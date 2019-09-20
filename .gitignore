@@ -2,3 +2,5 @@
 \.ipynb_checkpoints/
 
 \.vscode/
+
+backend/src/perf_test/

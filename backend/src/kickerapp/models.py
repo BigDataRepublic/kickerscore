@@ -5,6 +5,7 @@ from datetime import datetime
 from sqlalchemy import func, desc
 from sqlalchemy.ext.hybrid import hybrid_property
 from itertools import accumulate
+from sqlalchemy import types
 
 
 # Join class
@@ -72,6 +73,7 @@ class Player(db.Model):
     active = db.Column(db.Boolean, nullable=False, default=True)
 
     participant_entries = db.relationship('MatchParticipant', back_populates='player', lazy='select')
+    face_encodings = db.relationship('FaceEncoding', back_populates='player', lazy='select')
 
     rating_mu = db.Column(db.Float, nullable=False)
     rating_sigma = db.Column(db.Float, nullable=False)
@@ -139,4 +141,18 @@ class Player(db.Model):
                 "offense": self.offense_position,
                 "defense": self.defense_position
             }
+        }
+
+
+class FaceEncoding(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column('player_id', db.String(16), db.ForeignKey('player.slack_id'))
+    player = db.relationship('Player', back_populates='face_encodings', lazy='select')
+    encoding = db.Column(types.ARRAY(db.Float))
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "player_name": self.player.username,
+            "face_encoding": self.encoding
         }

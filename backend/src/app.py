@@ -4,10 +4,12 @@ from flask_restful import Resource, Api
 from flask_migrate import Migrate
 from flask_cors import CORS
 from apscheduler.schedulers.background import BackgroundScheduler
+from werkzeug.contrib.profiler import ProfilerMiddleware
 
 from kickerapp.match import MatchResource, MatchesResource, AnalyzePlayers, AnalyzeTeams
 from kickerapp.player import PlayerResource, PlayersResource
 from kickerapp.leaderboard import LeaderboardResource
+from kickerapp.face import FaceRecognitionResource, AddFacesResource
 from kickerapp.db import *
 from kickerapp.slack_sync import sync_new_and_left_channel_members, sync_existing_members_info
 
@@ -22,6 +24,9 @@ db.init_app(app)
 db.app = app
 
 migrate = Migrate(app, db)
+
+# Profiler
+# app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir="./perf_test/")
 
 # Watch it: this stuff will get out of control if you run multiple
 # instances of this app. Need to ensure there's just one scheduler!
@@ -47,6 +52,8 @@ api.add_resource(LeaderboardResource, '/kickerscore/api/v2/leaderboard')
 api.add_resource(PlayerResource, '/kickerscore/api/v2/player')
 api.add_resource(AnalyzePlayers, '/kickerscore/api/v2/analyze-players')
 api.add_resource(AnalyzeTeams, '/kickerscore/api/v2/analyze-teams')
+api.add_resource(FaceRecognitionResource, '/kickerscore/api/v2/recognize-faces')
+api.add_resource(AddFacesResource, '/kickerscore/api/v2/add-faces')
 api.add_resource(Healthz, '/healthz')
 
 if __name__ == '__main__':
