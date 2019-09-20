@@ -48,24 +48,27 @@ class FaceRecognitionResource(Resource):
 class AddFacesResource(Resource):
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('image', type=werkzeug.FileStorage, location='files')
-        parser.add_argument('usernames', type=str)
+        parser.add_argument('embeddings', type=list, location='json', action='append')
+        parser.add_argument('usernames', type=str, location='json', action='append')
 
         args = parser.parse_args()
 
-        if args['image'] is None:
-            return "No image specified", 400
+        if args['embeddings'] is None:
+            return "No embeddings specified", 400
 
-        if args['username'] is None or args['username'] == "":
-            return "No user specified", 400
+        if args['usernames'] is None:
+            return "No users specified", 400
 
-        user = Player.query.filter(func.lower(Player.slack_username) == func.lower(args['username'])).first()
+        if len(args['embeddings']) != len(args['usernames']):
+            return "Embeddings and usernames should be of the same size, {} != {}".format(len(args['embeddings']), len(args['usernames'])), 200
 
-        if user is None:
-            return "User {} does not exist".format(args['username']), 200
+        for user, embedding in zip(args['usernames'], args['embeddings']):
+            user = Player.query.filter(func.lower(Player.slack_username) == func.lower(user)).first()
 
-        filename = save_file(args['image'])
-        insert_new_face(filename, user.slack_id)
+            if user is None:
+                return "User {} does not exist".format(user), 200
+
+            insert_new_face(embedding, user.slack_id)
 
         return "OK", 200
 
@@ -116,9 +119,8 @@ def recognize_faces(face_image_path):
     return outputs
 
 
-def insert_new_face(face_image_path, user_id):
-    image_encoding = api.face_encodings(api.load_image_file(face_image_path))
-    face_encoding = FaceEncoding(player_id=user_id, encoding=image_encoding[0])
+def insert_new_face(embedding, user_id):
+    face_encoding = FaceEncoding(player_id=user_id, encoding=embedding)
 
     db.session.add(face_encoding)
     db.session.commit()
