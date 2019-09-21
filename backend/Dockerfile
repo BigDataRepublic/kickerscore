@@ -1,14 +1,15 @@
-FROM python:3.6.6-alpine3.8
-
-# Required for psycopg2 installation
-RUN apk --no-cache add build-base postgresql-dev cmake zlib
+FROM continuumio/miniconda3:4.7.10
 
 RUN mkdir /app
+COPY environment.yml /app
 COPY requirements.txt /app
 
-# For some reason we need to install numpy BEFORE installing pandas
-RUN pip install numpy==1.16.0
-RUN pip install -r /app/requirements.txt
+RUN conda update -n base -c defaults conda
+RUN apt-get update \
+    && apt-get install -y cmake gcc g++ make \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN conda env create -f /app/environment.yml
 COPY src /app
 
-CMD ["python", "/app/app.py"]
+CMD ["/opt/conda/envs/kickerscore/bin/python", "/app/app.py"]
