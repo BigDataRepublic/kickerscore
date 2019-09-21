@@ -12,4 +12,6 @@ RUN apt-get update \
 RUN conda env create -f /app/environment.yml
 COPY src /app
 
-CMD ["/opt/conda/envs/kickerscore/bin/python", "/app/app.py"]
+RUN ln -sf /opt/conda/envs/kickerscore/bin/python /opt/conda/bin/python
+
+CMD ["python", "/app/app.py"]
