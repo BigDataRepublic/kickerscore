@@ -32,9 +32,9 @@ migrate = Migrate(app, db)
 # instances of this app. Need to ensure there's just one scheduler!
 scheduler = BackgroundScheduler(timezone="Europe/Amsterdam")
 # Check channel if there are new players
-new_player_sync = scheduler.add_job(sync_new_and_left_channel_members, "interval", seconds=30)
+new_player_sync = scheduler.add_job(sync_new_and_left_channel_members, "interval", minutes=5)
 # Revisit existing players and update info if changed
-existing_player_sync = scheduler.add_job(sync_existing_members_info, "interval", minutes=1)
+existing_player_sync = scheduler.add_job(sync_existing_members_info, "interval", minutes=10)
 
 
 class Healthz(Resource):

@@ -7,10 +7,17 @@ from .config import MU, SIGMA
 from .models import Player
 from .db import db
 
+
+# Create logger
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+ch = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 
-slack_oauth_token = os.environ["SLACK_OAUTH_TOKEN"]
+slack_oauth_token = os.environ["SLACK_OAUTH_TOKEN"] if "SLACK_OAUTH_TOKEN" in os.environ else None
 try:
     kickerscore_channel_ids = os.environ.get("KICKERSCORE_CHANNEL_ID").split(",")
 except AttributeError:
@@ -19,14 +26,31 @@ sc = SlackClient(slack_oauth_token)
 
 
 def sync_new_and_left_channel_members():
+    if slack_oauth_token is None:
+        logger.warn("SLACK_OAUTH_TOKEN is not defined, cannot do Slack sync")
+        return
+
+    if len(kickerscore_channel_ids) == 0:
+        logger.warn("KICKERSCORE_CHANNEL_ID is not defined, cannot do Slack sync")
+        return
+
     current_slack_members = []
     for channel_id in kickerscore_channel_ids:
         logger.info("Running new channel member check for {}".format(channel_id))
-        current_slack_members += sc.api_call(
-            "conversations.members", channel=channel_id)["members"]
+        channel_users = sc.api_call(
+            "conversations.members", channel=channel_id)
+        if "members" in channel_users:
+            current_slack_members += channel_users["members"]
+        else:
+            # Error in getting Slack members
+            logger.error("Error while retrieving Slack members for channel ID {}".format(channel_id))
 
     current_slack_members = set(current_slack_members)
-    
+
+    if len(current_slack_members) == 0:
+        logger.warn("0 Slack members found while syncing channel members")
+        return
+
     current_db_players = Player.query.all()
     current_db_players_ids = set([p.slack_id for p in current_db_players])
     to_deactivate_players = current_db_players_ids - current_slack_members
@@ -54,7 +78,7 @@ def _make_username(player_info):
 
 def _sync_new_and_left_channel_members_per_channel(new_players, to_deactivate_players, to_reactivate_players):
     current_db_players = Player.query.all()
-    logger.info(f"Going to add {new_players} new player(s)")
+    logger.info(f"Going to add {len(new_players)} new player(s)")
     for np in new_players:
         player_info = sc.api_call("users.info", user=np)["user"]
         player_name = _make_username(player_info)
@@ -86,6 +110,10 @@ def _sync_new_and_left_channel_members_per_channel(new_players, to_deactivate_pl
 
 
 def sync_existing_members_info():
+    if slack_oauth_token is None:
+        logger.warn("SLACK_OAUTH_TOKEN is not defined, cannot do Slack sync")
+        return
+
     current_db_players = Player.query.all()
     logger.info(f"Running existing player sync for {len(current_db_players)} players")
 
