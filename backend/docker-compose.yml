@@ -9,6 +9,7 @@ services:
     - db
     depends_on:
     - db
+    - migrator
     environment:
     - POSTGRES_USER=foo
     - POSTGRES_PASSWORD=bar
@@ -36,5 +37,5 @@ services:
     - FLASK_APP=/app/app
     - SLACK_OAUTH_TOKEN=${SLACK_OAUTH_TOKEN}
     - KICKERSCORE_CHANNEL_ID=${KICKERSCORE_CHANNEL_ID}
-    command: "flask db upgrade -d /app/migrations"
+    command: "python -m flask db upgrade -d /app/migrations"
     restart: on-failure

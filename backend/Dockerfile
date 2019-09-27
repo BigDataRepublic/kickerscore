@@ -16,5 +16,6 @@ RUN /opt/conda/envs/kickerscore/bin/pip install face_recognition==1.2.3 face_rec
 COPY src /app
 
 RUN ln -sf /opt/conda/envs/kickerscore/bin/python /opt/conda/bin/python
+ENV PATH=/opt/conda/envs/kickerscore/bin/:$PATH
 
 CMD ["python", "/app/app.py"]
