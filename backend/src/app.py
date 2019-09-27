@@ -33,7 +33,6 @@ migrate = Migrate(app, db)
 scheduler = BackgroundScheduler(timezone="Europe/Amsterdam")
 # Check channel if there are new players
 new_player_sync = scheduler.add_job(sync_new_and_left_channel_members, "interval", minutes=5)
-new_player_sync.func()
 # Revisit existing players and update info if changed
 existing_player_sync = scheduler.add_job(sync_existing_members_info, "interval", minutes=10)
 
@@ -59,6 +58,7 @@ api.add_resource(Healthz, '/healthz')
 
 if __name__ == '__main__':
     scheduler.start()
+    new_player_sync.func()
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
 
