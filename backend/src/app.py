@@ -58,6 +58,7 @@ api.add_resource(Healthz, '/healthz')
 
 if __name__ == '__main__':
     scheduler.start()
+    new_player_sync.func()
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
 
