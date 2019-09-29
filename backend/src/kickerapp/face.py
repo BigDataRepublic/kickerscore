@@ -56,10 +56,10 @@ class AddFacesResource(Resource):
 
         args = parser.parse_args()
 
-        if args['embeddings'] is None:
+        if args['embeddings'] is None or len(args['embeddings']) == 0:
             return "No embeddings specified", 400
 
-        if args['usernames'] is None:
+        if args['usernames'] is None or len(args['usernames']) == 0:
             return "No users specified", 400
 
         if len(args['embeddings']) != len(args['usernames']):
@@ -71,10 +71,13 @@ class AddFacesResource(Resource):
             user = Player.query.filter(func.lower(Player.slack_username) == func.lower(user)).first()
 
             if user is None:
-                return "User {} does not exist".format(user), 200
+                db.session.rollback()
+                return "User {} does not exist".format(user), 400
 
-            insert_new_face(embedding, user.slack_id)
+            face_encoding = FaceEncoding(player_id=user.slack_id, encoding=embedding)
+            db.session.add(face_encoding)
 
+        db.session.commit()
         return "OK", 200
 
 
@@ -122,10 +125,3 @@ def recognize_faces(face_image_path):
             })
 
     return outputs
-
-
-def insert_new_face(embedding, user_id):
-    face_encoding = FaceEncoding(player_id=user_id, encoding=embedding)
-
-    db.session.add(face_encoding)
-    db.session.commit()
