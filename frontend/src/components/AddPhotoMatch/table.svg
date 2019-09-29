@@ -1,0 +1,68 @@
+<?xml version="1.0" standalone="no"?>
+<!-- Generator: Gravit.io --><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="isolation:isolate" viewBox="330 191 1148 748" width="1148" height="748">
+    <defs>
+        <clipPath id="_clipPath_HO5uEr7xIeqUOc5ZIirPT2orRP6mGs8j">
+            <rect x="330" y="191" width="1148" height="748" />
+        </clipPath>
+    </defs>
+    <g clip-path="url(#_clipPath_HO5uEr7xIeqUOc5ZIirPT2orRP6mGs8j)">
+        <path d="M 728.615 221 L 1094.385 221 C 1121.216 221 1143 242.784 1143 269.615 L 1143 860.385 C 1143 887.216 1121.216 909 1094.385 909 L 728.615 909 C 701.784 909 680 887.216 680 860.385 L 680 269.615 C 680 242.784 701.784 221 728.615 221 Z" style="stroke:none;fill:#0C590C;stroke-miterlimit:10;" />
+        <path d="M 728.615 221 L 1094.385 221 C 1121.216 221 1143 242.784 1143 269.615 L 1143 860.385 C 1143 887.216 1121.216 909 1094.385 909 L 728.615 909 C 701.784 909 680 887.216 680 860.385 L 680 269.615 C 680 242.784 701.784 221 728.615 221 Z" style="fill:none;stroke:#6C3211;stroke-width:30;stroke-linecap:square;stroke-miterlimit:2;" />
+        <rect x="840.5" y="206" width="142" height="30" transform="matrix(1,0,0,1,0,0)" fill="rgb(184,185,191)" />
+        <rect x="840.5" y="894" width="142" height="30" transform="matrix(1,0,0,1,0,0)" fill="rgb(184,185,191)" />
+        <g>
+            <path d="M 700.5 555 L 1122.5 555 C 1125.26 555 1127.5 557.24 1127.5 560 L 1127.5 560 C 1127.5 562.76 1125.26 565 1122.5 565 L 700.5 565 C 697.74 565 695.5 562.76 695.5 560 L 695.5 560 C 695.5 557.24 697.74 555 700.5 555 Z" style="stroke:none;fill:#EBEBEB;stroke-linecap:square;stroke-miterlimit:2;" />
+            <ellipse vector-effect="non-scaling-stroke" cx="911.5000000000001" cy="560" rx="56" ry="55" fill="none" stroke-width="10" stroke="rgb(235,235,235)" stroke-linejoin="miter" stroke-linecap="square" stroke-miterlimit="3" />
+        </g>
+        <g id="red-defense">
+            <path d="M 543.882 307 L 1201.618 307 C 1206.244 307 1210 310.756 1210 315.382 L 1210 316.618 C 1210 321.244 1206.244 325 1201.618 325 L 543.882 325 C 539.256 325 535.5 321.244 535.5 316.618 L 535.5 315.382 C 535.5 310.756 539.256 307 543.882 307 Z" style="stroke:none;fill:#84858C;stroke-linecap:square;stroke-miterlimit:2;" />
+            <path d="M 545.16 295 L 587.84 295 C 593.171 295 597.5 299.329 597.5 304.66 L 597.5 327.34 C 597.5 332.671 593.171 337 587.84 337 L 545.16 337 C 539.829 337 535.5 332.671 535.5 327.34 L 535.5 304.66 C 535.5 299.329 539.829 295 545.16 295 Z" style="stroke:none;fill:#D52828;stroke-linecap:square;stroke-miterlimit:2;" />
+        </g>
+        <g id="red-offense">
+            <path d="M 544.382 669 L 1202.118 669 C 1206.744 669 1210.5 672.756 1210.5 677.382 L 1210.5 678.618 C 1210.5 683.244 1206.744 687 1202.118 687 L 544.382 687 C 539.756 687 536 683.244 536 678.618 L 536 677.382 C 536 672.756 539.756 669 544.382 669 Z" style="stroke:none;fill:#84858C;stroke-linecap:square;stroke-miterlimit:2;" />
+            <path d="M 545.66 657 L 588.34 657 C 593.671 657 598 661.329 598 666.66 L 598 689.34 C 598 694.671 593.671 699 588.34 699 L 545.66 699 C 540.329 699 536 694.671 536 689.34 L 536 666.66 C 536 661.329 540.329 657 545.66 657 Z" style="stroke:none;fill:#D52828;stroke-linecap:square;stroke-miterlimit:2;" />
+        </g>
+        <g id="blue-offense">
+            <path d="M 606.382 431 L 1264.118 431 C 1268.744 431 1272.5 434.756 1272.5 439.382 L 1272.5 440.618 C 1272.5 445.244 1268.744 449 1264.118 449 L 606.382 449 C 601.756 449 598 445.244 598 440.618 L 598 439.382 C 598 434.756 601.756 431 606.382 431 Z" style="stroke:none;fill:#84858C;stroke-linecap:square;stroke-miterlimit:2;" />
+            <path d="M 1220.16 419 L 1262.84 419 C 1268.171 419 1272.5 423.329 1272.5 428.66 L 1272.5 451.34 C 1272.5 456.671 1268.171 461 1262.84 461 L 1220.16 461 C 1214.829 461 1210.5 456.671 1210.5 451.34 L 1210.5 428.66 C 1210.5 423.329 1214.829 419 1220.16 419 Z" style="stroke:none;fill:#3E33CC;stroke-linecap:square;stroke-miterlimit:2;" />
+        </g>
+        <g id="blue-defense">
+            <path d="M 606.382 800 L 1264.118 800 C 1268.744 800 1272.5 803.756 1272.5 808.382 L 1272.5 809.618 C 1272.5 814.244 1268.744 818 1264.118 818 L 606.382 818 C 601.756 818 598 814.244 598 809.618 L 598 808.382 C 598 803.756 601.756 800 606.382 800 Z" style="stroke:none;fill:#84858C;stroke-linecap:square;stroke-miterlimit:2;" />
+            <path d="M 1220.16 788 L 1262.84 788 C 1268.171 788 1272.5 792.329 1272.5 797.66 L 1272.5 820.34 C 1272.5 825.671 1268.171 830 1262.84 830 L 1220.16 830 C 1214.829 830 1210.5 825.671 1210.5 820.34 L 1210.5 797.66 C 1210.5 792.329 1214.829 788 1220.16 788 Z" style="stroke:none;fill:#3E33CC;stroke-linecap:square;stroke-miterlimit:2;" />
+        </g>
+        <g>
+            <defs>
+                <pattern x="-.15" y="0" width="1" height="1" patternUnits="objectBoundingBox" id="pattern-red-defense">
+                    <image id="red-defense" />
+                </pattern>
+                <pattern x="-.15" y="0" width="1" height="1" patternUnits="objectBoundingBox" id="pattern-red-offense">
+                    <image id="red-offense" />
+                </pattern>
+                <pattern x="-.15" y="0" width="1" height="1" patternUnits="objectBoundingBox" id="pattern-blue-offense">
+                    <image id="blue-offense" />
+                </pattern>
+                <pattern x="-.15" y="0" width="1" height="1" patternUnits="objectBoundingBox" id="pattern-blue-defense">
+                    <image id="blue-defense" />
+                </pattern>
+            </defs>
+            <ellipse id="red-defense" cx="405" cy="316" rx="75" ry="73.75" fill="rgb(235,235,235)" />
+            <text id="red-defense" text-anchor="middle" dx="405" dy="339" style="font-weight:400;font-size:84px;font-style:normal;fill:#000000;stroke:none;">?</text>
+            <text id="red-defense-sm" text-anchor="middle" dx="405" dy="443" style="font-weight:400;font-size:42px;font-style:normal;fill:#000000;stroke:none;"></text>
+        </g>
+        <g>
+            <ellipse id="red-offense" vector-effect="non-scaling-stroke" cx="405" cy="678" rx="75" ry="73.75" fill="rgb(235,235,235)" />
+            <text id="red-offense" text-anchor="middle" dx="405" dy="703" style="font-weight:400;font-size:84px;font-style:normal;fill:#000000;stroke:none;">?</text>
+            <text id="red-offense-sm" text-anchor="middle" dx="405" dy="807" style="font-weight:400;font-size:42px;font-style:normal;fill:#000000;stroke:none;"></text>
+        </g>
+        <g>
+            <ellipse id="blue-offense" vector-effect="non-scaling-stroke" cx="1403" cy="440" rx="75" ry="73.75" fill="rgb(235,235,235)" />
+            <text id="blue-offense" text-anchor="middle" dx="1403" dy="465" style="font-weight:400;font-size:84px;font-style:normal;fill:#000000;stroke:none;">?</text>
+            <text id="blue-offense-sm" text-anchor="middle" dx="1403" dy="560" style="font-weight:400;font-size:42px;font-style:normal;fill:#000000;stroke:none;"></text>
+        </g>
+        <g style="width:300px;">
+            <ellipse id="blue-defense" vector-effect="non-scaling-stroke" cx="1403" cy="809" rx="75" ry="73.75" fill="rgb(235,235,235)" />
+            <text id="blue-defense" text-anchor="middle" dx="1403" dy="834" style="font-weight:400;font-size:84px;font-style:normal;fill:#000000;stroke:none;">?</text>
+            <text id="blue-defense-sm" text-anchor="middle" dx="1403" dy="929" style="font-weight:400;font-size:42px;font-style:normal;fill:#000000;stroke:none;"></text>
+        </g>
+    </g>
+</svg>

@@ -28,7 +28,7 @@ export const getLeaderboard = async () =>
 export const postMatch = (playersData, points) =>
     fetch(`${V2_URL}/match`, {
         method: "POST",
-        body: JSON.stringify({ players: playersData, points }),
+        body: JSON.stringify({players: playersData, points}),
         headers: {
             "Content-Type": "application/json"
         }
@@ -39,7 +39,7 @@ export const postMatch = (playersData, points) =>
 export const postPlayerAnalysis = async playerList =>
     fetch(`${V2_URL}/analyze-players`, {
         method: "POST",
-        body: JSON.stringify({ players: playerList }),
+        body: JSON.stringify({players: playerList}),
         headers: {
             "Content-Type": "application/json"
         }
@@ -50,7 +50,33 @@ export const postPlayerAnalysis = async playerList =>
 export const postTeamAnalysis = async teamComposition =>
     fetch(`${V2_URL}/analyze-teams`, {
         method: "POST",
-        body: JSON.stringify({ players: teamComposition }),
+        body: JSON.stringify({players: teamComposition}),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+        .then(checkResponseStatus)
+        .then(parseJSON);
+
+
+export const recognizeFaces = async image =>
+    fetch(`${V2_URL}/recognize-faces`, {
+        method: "POST",
+        body: JSON.stringify({image: image}),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+        .then(checkResponseStatus)
+        .then(parseJSON);
+
+export const addFaces = async (embeddings, usernames) =>
+    fetch(`${V2_URL}/add-faces`, {
+        method: "POST",
+        body: JSON.stringify({
+            embeddings: embeddings,
+            usernames: usernames
+        }),
         headers: {
             "Content-Type": "application/json"
         }

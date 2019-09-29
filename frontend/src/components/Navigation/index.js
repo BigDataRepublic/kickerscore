@@ -46,7 +46,7 @@ export default class Navigation extends React.Component {
             <NavLink href="/"><div style={navFontStyle}>Leaderboard</div></NavLink>
           </NavItem>
           <NavItem>
-            <NavLink href="/add-match/"><div style={navFontStyle}>Add Match</div></NavLink>
+            <NavLink href="/add-photo-match/"><div style={navFontStyle}>Add Match</div></NavLink>
           </NavItem>
             </Nav>
         </Navbar>
