@@ -24,8 +24,6 @@ export default class TakePhotoComponent extends Component {
     };
 
     playerRows = (index) => {
-        // const selectedList = this.selectedPlayersAsList();
-        console.log(this.state.players);
         return (
             <ListGroup flush>
                 {this.state.players
@@ -114,7 +112,6 @@ export default class TakePhotoComponent extends Component {
                         let encodedImage = dataUri.substr(22, dataUri.length);
 
                         recognizeFaces(encodedImage).then((response) => {
-                            console.log(response);
                             this.setState({
                                 'crops': response.outputs,
                                 'photoTaken': true

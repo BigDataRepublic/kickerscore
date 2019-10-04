@@ -27,7 +27,8 @@ class AddPhotoMatchForm extends Component {
                     defense: null
                 }
             },
-            popoverOpen: false
+            popoverOpen: false,
+            showPhotoComponent: true
         };
     }
 
@@ -36,7 +37,6 @@ class AddPhotoMatchForm extends Component {
         this.setState({
             players: data.players
         });
-        console.log(data)
 
         const flashHandle = handleName => {
             d3.select(`g#${handleName}`)
@@ -279,21 +279,18 @@ class AddPhotoMatchForm extends Component {
                 )}
                 <Row>
                     <Col>
-                        <TakePhotoComponent onComplete={(players) => {
-                            // console.log(players);
-                            // this.selectPlayer('red', 'defence', players[0].player.username, players[0].player.avatar);
-                            // this.selectPlayer('red', 'offence', players[1].player.username, players[1].player.avatar);
-                            // this.selectPlayer('blue', 'defence', players[2].player.username, players[2].player.avatar);
-                            // this.selectPlayer('blue', 'offence', players[3].player.username, players[3].player.avatar);
-                            // const newPlayers = this.state.selectedPlayers;
-                            // newPlayers.blue.offense = players[0];
-                            // newPlayers.blue.defense = players[1];
-                            // newPlayers.red.offense = players[2];
-                            // newPlayers.red.defense = players[3];
-                            // this.setState({'selectedPlayers': newPlayers})
+                        {this.state.showPhotoComponent && <TakePhotoComponent onComplete={(players) => {
+                            this.setState({'showPhotoComponent': false});
+                            this.selectPlayer('red', 'defense', players[0].player.username, players[0].player.avatar);
+                            this.selectPlayer('red', 'offense', players[1].player.username, players[1].player.avatar);
+                            this.selectPlayer('blue', 'defense', players[2].player.username, players[2].player.avatar);
+                            this.selectPlayer('blue', 'offense', players[3].player.username, players[3].player.avatar);
+                            this.balanceTeams();
                         }}/>
+                        }
                     </Col>
                 </Row>
+                {!this.state.showPhotoComponent &&
                 <Row>
                     <Col>
                         <AddMatchComponent
@@ -303,11 +300,14 @@ class AddPhotoMatchForm extends Component {
                         />
                     </Col>
                 </Row>
+                }
+                {!this.state.showPhotoComponent &&
                 <Row>
                     <TableSVG style={{height: "60vh", width: "80vw"}}/>
                 </Row>
 
-                {(loadingOdds || loadingOddsError || predicted_win_prob_for_blue) && (
+                }
+                {!this.state.showPhotoComponent && (loadingOdds || loadingOddsError || predicted_win_prob_for_blue) && (
                     <Row style={{margin: "2em"}}>
                         <Col>
                             <GetOddsAndBalanceComponent
