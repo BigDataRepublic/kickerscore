@@ -187,7 +187,7 @@ spec:
     spec:
       initContainers:
         - name: kickerscore-db-migrate
-          image: 10.8.0.1:30000/sreitsma/kickerscore:v2.2
+          image: bigdatarepublic/kickerscore:{{ git_hash }}
           command: ["flask", "db", "upgrade", "-d", "/app/migrations"]
           env:
             - name: "POSTGRES_HOST"
@@ -216,7 +216,7 @@ spec:
               value: "/app/app"
       containers:
       - name: kickerscore-backend
-        image: 10.8.0.1:30000/sreitsma/kickerscore:v2.2
+        image: bigdatarepublic/kickerscore:{{ git_hash }}
         ports:
           - containerPort: 5000
         resources:
@@ -282,7 +282,7 @@ spec:
     spec:
       containers:
       - name: kickerscore-frontend
-        image: 10.8.0.1:30000/sreitsma/kickerscore-frontend:v2
+        image: bigdatarepublic/kickerscore-frontend:{{ git_hash }}
         ports:
           - containerPort: 3000
         resources:
