@@ -111,11 +111,12 @@ def recognize_faces(face_image_path):
 
             scores[face_encoding_group[0].player] = sum(face_distances) / len(face_distances)
 
+        recognized_player = None
         if len(scores) > 0:
             recognized_player = max(scores, key=scores.get)
-
             if scores[recognized_player] < THRESHOLD:
                 recognized_player = None
+                
 
         # Create a crop of the face
         top, right, bottom, left = face_locations[i]
