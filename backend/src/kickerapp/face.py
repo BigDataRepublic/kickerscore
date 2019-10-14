@@ -14,6 +14,9 @@ import base64
 import io
 
 
+THRESHOLD = 0.6
+
+
 def save_file(image):
     generated_uuid = uuid4().hex
 
@@ -86,7 +89,7 @@ def recognize_faces(face_image_path):
     image = api.load_image_file(face_image_path)
 
     # Get face locations in image
-    face_locations = api.face_locations(image)
+    face_locations = api.face_locations(image, model="hog")
 
     # Create encodings from image
     face_encodings = api.face_encodings(image, known_face_locations=face_locations)
@@ -99,17 +102,16 @@ def recognize_faces(face_image_path):
 
     # Loop through detected faces
     for i, face_encoding in enumerate(face_encodings):
-        face_matches = api.compare_faces(existing_face_encodings, face_encoding)
+        face_distances = api.face_distance(existing_face_encodings, face_encoding)
         recognized_player = None
 
-        if any(face_matches):
-            # Face matched to existing face
-            ix = face_matches.index(True)
+        if any(face_distances > THRESHOLD):
+            # Face matched to existing face, find the best one
+            ix = np.argmax(face_distances)
             recognized_player = existing_face_encoding_objects[ix].player
 
-        # Face found, but could not be matched
+        # Create a crop of the face
         top, right, bottom, left = face_locations[i]
-
         image_crop = image[top:bottom, left:right]
 
         im = Image.fromarray(image_crop)
