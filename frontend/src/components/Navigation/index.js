@@ -6,11 +6,11 @@ import {
   NavItem,
   NavLink,
   Media} from 'reactstrap';
-import BDRLogo from "./Logo-Elephant.png";
+import BDRLogo from "./Logo.png";
 
 let imgStyle = {
   maxHeight: '64px',
-  maxWidth: '64px'
+  maxWidth: '167px'
 };
 
 let navFontStyle = {
@@ -38,7 +38,7 @@ export default class Navigation extends React.Component {
         <Navbar color="light" light expand="md">
           <NavbarBrand href="/">
             <Media left>
-              <Media object style={imgStyle} src={ BDRLogo } alt="My PlaceHolder Picture" />
+              <Media object style={imgStyle} src={ BDRLogo } alt="Logo" />
             </Media>
           </NavbarBrand>
             <Nav className="ml-auto" navbar>
