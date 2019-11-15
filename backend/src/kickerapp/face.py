@@ -12,6 +12,11 @@ import numpy as np
 from PIL import Image
 import base64
 import io
+from itertools import groupby
+from operator import attrgetter
+
+
+THRESHOLD = 0.6
 
 
 def save_file(image):
@@ -86,30 +91,34 @@ def recognize_faces(face_image_path):
     image = api.load_image_file(face_image_path)
 
     # Get face locations in image
-    face_locations = api.face_locations(image)
+    face_locations = api.face_locations(image, model="hog")
 
     # Create encodings from image
     face_encodings = api.face_encodings(image, known_face_locations=face_locations)
 
     # Get encodings from DB
-    existing_face_encoding_objects = FaceEncoding.query.all()
-    existing_face_encodings = np.array([fe.encoding for fe in existing_face_encoding_objects])
+    existing_face_encoding_objects = [list(g) for _, g in groupby(FaceEncoding.query.order_by(FaceEncoding.player_id).all(), attrgetter('player_id'))]
 
     outputs = []
 
-    # Loop through detected faces
     for i, face_encoding in enumerate(face_encodings):
-        face_matches = api.compare_faces(existing_face_encodings, face_encoding)
+        distances = {}
+
+        for face_encoding_group in existing_face_encoding_objects:
+            # Calculate distance to every encoding for this group (person)
+            existing_face_encodings = np.array([fe.encoding for fe in face_encoding_group])
+            face_distances = api.face_distance(existing_face_encodings, face_encoding)
+
+            distances[face_encoding_group[0].player] = sum(face_distances) / len(face_distances)
+
         recognized_player = None
+        if len(distances) > 0:
+            recognized_player = min(distances, key=distances.get)
+            if distances[recognized_player] > THRESHOLD:
+                recognized_player = None
 
-        if any(face_matches):
-            # Face matched to existing face
-            ix = face_matches.index(True)
-            recognized_player = existing_face_encoding_objects[ix].player
-
-        # Face found, but could not be matched
+        # Create a crop of the face
         top, right, bottom, left = face_locations[i]
-
         image_crop = image[top:bottom, left:right]
 
         im = Image.fromarray(image_crop)
