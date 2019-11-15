@@ -102,21 +102,20 @@ def recognize_faces(face_image_path):
     outputs = []
 
     for i, face_encoding in enumerate(face_encodings):
-        scores = {}
+        distances = {}
 
         for face_encoding_group in existing_face_encoding_objects:
             # Calculate distance to every encoding for this group (person)
             existing_face_encodings = np.array([fe.encoding for fe in face_encoding_group])
             face_distances = api.face_distance(existing_face_encodings, face_encoding)
 
-            scores[face_encoding_group[0].player] = sum(face_distances) / len(face_distances)
+            distances[face_encoding_group[0].player] = sum(face_distances) / len(face_distances)
 
         recognized_player = None
-        if len(scores) > 0:
-            recognized_player = max(scores, key=scores.get)
-            if scores[recognized_player] < THRESHOLD:
+        if len(distances) > 0:
+            recognized_player = min(distances, key=distances.get)
+            if distances[recognized_player] > THRESHOLD:
                 recognized_player = None
-                
 
         # Create a crop of the face
         top, right, bottom, left = face_locations[i]
